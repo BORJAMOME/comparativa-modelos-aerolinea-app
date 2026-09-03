@@ -69,9 +69,9 @@ st.markdown(
     f"""
     <div id="top" class="hero-wrap">
       <p class="hero-kicker">Machine Learning Case Study · Clasificación multiclase</p>
-      <h1 class="hero-title">Una aerolínea le envía la misma oferta al cliente que vuela una vez al año y al que vuela cada semana, porque no tiene forma automática de <em>distinguirlos</em>. Así es como le enseñamos a un modelo a hacerlo por ella.</h1>
-      <p class="hero-sub">Comparamos Regresión Logística, Random Forest y Gradient Boosting para clasificar a
-      {n_fmt} clientes de una aerolínea en tres segmentos comerciales — con el mismo split, el mismo
+      <h1 class="hero-title">Una aerolínea le envía la misma oferta al cliente que vuela una vez al año y al que vuela cada semana, porque no tiene forma automática de <em>distinguirlos</em>. Así es como le enseñé a un modelo a hacerlo por ella.</h1>
+      <p class="hero-sub">Comparé Regresión Logística, Random Forest y Gradient Boosting para clasificar a
+      {n_fmt} clientes de una aerolínea en tres segmentos comerciales, con el mismo split, el mismo
       preprocesamiento y la misma validación cruzada, para que ganara el mejor modelo y no el más
       publicitado.</p>
       <div class="hero-meta">
@@ -110,8 +110,9 @@ ui.question_block(
     'Con el comportamiento de vuelo, gasto e incidencias disponible, '
     '<span class="accent">¿se puede predecir el segmento con fiabilidad suficiente para automatizar campañas</span>, '
     'y qué modelo merece decidirlo?',
-    "No basta con que un modelo funcione: hay que demostrar que supera con claridad a una regla trivial, "
-    "y comparar varios candidatos con el mismo criterio antes de elegir cuál pasa a producción.",
+    "No me bastaba con que un modelo funcionara: tenía que demostrar que superaba con claridad a una "
+    "regla trivial, y comparar varios candidatos con el mismo criterio antes de elegir cuál pasaba a "
+    "producción.",
 )
 ui.section_close()
 
@@ -141,8 +142,8 @@ st.dataframe(
     use_container_width=True, hide_index=True,
 )
 ui.finding(
-    "Entre el 1,5% y el 3,5% de nulos en 5 variables — poco, pero suficiente para que un "
-    "<code>dropna()</code> a lo bruto tirara el 10,8% de las filas. Se imputan dentro del pipeline "
+    "Entre el 1,5% y el 3,5% de nulos en 5 variables: poco, pero suficiente para que un "
+    "<code>dropna()</code> a lo bruto tirara el 10,8% de las filas. Los imputé dentro del pipeline "
     "(mediana en numéricas, moda en categóricas), ajustado solo sobre el conjunto de entrenamiento."
 )
 ui.section_close()
@@ -150,21 +151,22 @@ ui.section_close()
 # ============================================================ EXPLORACIÓN ==
 ui.section_open("exploracion")
 ui.eyebrow("Antes de modelar")
-ui.h2("¿Qué nos dicen los datos?")
+ui.h2("¿Qué me dicen los datos?")
 ui.lead(
-    "Tres preguntas antes de entrenar nada: ¿hay valores extremos que puedan distorsionar el modelo?, "
-    "¿hay variables que miden lo mismo dos veces?, ¿alguna variable delata la respuesta demasiado bien?"
+    "Antes de entrenar nada, me hice tres preguntas: ¿hay valores extremos que puedan distorsionar el "
+    "modelo? ¿Hay variables que miden lo mismo dos veces? ¿Alguna variable delata la respuesta "
+    "demasiado bien?"
 )
 
 ui.h3("¿Cuántos outliers hay, según el método que uses?")
 st.plotly_chart(charts.outlier_comparison(outlier_df, FEATURE_LABELS), use_container_width=True,
                  config={"displayModeBar": False})
 ui.finding(
-    f"Los cuatro métodos no coinciden — normal, cada uno mide algo distinto. Se optó por "
+    f"Los cuatro métodos no coinciden: normal, cada uno mide algo distinto. Opté por "
     f"<b>capar (winsorizing) en los percentiles P1/P99</b>, la opción más conservadora: conserva el "
     f"100% de los {n_fmt} clientes pero evita que un valor extremo distorsione medias y modelos. "
     f"Isolation Forest, que sí mira todas las variables a la vez, señala un {pct(stats['n_outliers_iforest']/stats['n_customers'])} "
-    "de clientes como atípicos globales — se calcula solo con fines de EDA, nunca se usa como variable del modelo."
+    "de clientes como atípicos globales; lo calculé solo con fines de EDA, nunca lo usé como variable del modelo."
 )
 
 ui.h3("¿Hay variables que miden lo mismo dos veces?")
@@ -174,8 +176,8 @@ max_vif = vif_df.loc[vif_df["VIF"].idxmax()]
 ui.finding(
     f"La correlación entre variables es prácticamente nula en casi todos los pares, y el <b>VIF</b> "
     f"(factor de inflación de varianza) confirma que no hay multicolinealidad real: la variable más "
-    f"alta es <b>{FEATURE_LABELS.get(max_vif['variable'], max_vif['variable'])}</b> con VIF={max_vif['VIF']:.2f} "
-    "— muy por debajo del umbral de alerta (5). Cada variable aporta información distinta, así que no "
+    f"alta es <b>{FEATURE_LABELS.get(max_vif['variable'], max_vif['variable'])}</b> con VIF={max_vif['VIF']:.2f}, "
+    "muy por debajo del umbral de alerta (5). Cada variable aporta información distinta, así que no "
     "hace falta descartar ninguna antes de modelar."
 )
 
@@ -189,7 +191,7 @@ top_leak = leakage_df.iloc[0]
 ui.finding(
     f"Ninguna variable supera eta²=0.95 (separación casi perfecta, señal de fuga de información). La más "
     f"relacionada con el segmento es <b>{FEATURE_LABELS.get(top_leak['variable'], top_leak['variable'])}</b> "
-    f"(eta²={top_leak['eta2']:.2f}) — una relación real y esperable, no una fuga: es justo el tipo de "
+    f"(eta²={top_leak['eta2']:.2f}): una relación real y esperable, no una fuga. Es justo el tipo de "
     "variable que debería influir en el segmento de un cliente frecuente."
 )
 ui.section_close()
@@ -203,27 +205,27 @@ ui.lead(
     "es justa. Este es el camino para evitarlo."
 )
 ui.story_steps([
-    ("Partimos del dato capado, no del original",
-     "El winsorizing (P1/P99) de la sección anterior alimenta el modelo — así el tratamiento de "
+    ("Partí del dato capado, no del original",
+     "El winsorizing (P1/P99) de la sección anterior alimenta el modelo: así el tratamiento de "
      "outliers deja de ser un ejercicio aislado de EDA y pasa a formar parte del pipeline real."),
-    ("Excluimos explícitamente la señal de Isolation Forest",
-     "Es un artefacto de EDA calculado sobre todo el dataset antes de separar train y test — no es una "
-     "variable de negocio disponible para un cliente nuevo. Usarla sería hacer trampas."),
-    ("Imputamos y escalamos dentro de un Pipeline",
+    ("Excluí explícitamente la señal de Isolation Forest",
+     "Es un artefacto de EDA calculado sobre todo el dataset antes de separar train y test: no es una "
+     "variable de negocio disponible para un cliente nuevo. Usarla habría sido hacer trampas."),
+    ("Imputé y escalé dentro de un Pipeline",
      "Nada se imputa a mano ni fuera del flujo: la mediana/moda del imputador se calcula solo sobre "
      "entrenamiento, evitando que información de test se filtre al modelo."),
-    ("Definimos un suelo mínimo: el baseline",
+    ("Definí un suelo mínimo: el baseline",
      f"Un clasificador que siempre predice la clase mayoritaria acierta el {pct(stats['baseline']['accuracy'])} "
      "de las veces. Ningún modelo real vale la pena si no lo supera con claridad."),
-    ("Entrenamos los 3 candidatos con el mismo split y preprocesamiento",
-     "Regresión Logística, Random Forest y Gradient Boosting, envueltos en el mismo Pipeline — la única "
+    ("Entrené los 3 candidatos con el mismo split y preprocesamiento",
+     "Regresión Logística, Random Forest y Gradient Boosting, envueltos en el mismo Pipeline: la única "
      "diferencia entre ellos es el algoritmo, no la preparación de los datos."),
-    ("Comparamos con validación cruzada antes de mirar el test",
-     "Un único split 80/20 (300 clientes) tiene demasiada varianza para declarar un ganador. Los 3 "
-     "modelos se comparan primero con 5-fold estratificado sobre el conjunto de entrenamiento."),
-    ("Confirmamos en un test que ningún modelo vio nunca",
-     "Solo al final, cada modelo se reentrena sobre todo el train y se evalúa una única vez sobre el "
-     "20% que quedó completamente al margen — la prueba de que el ranking no es casualidad."),
+    ("Comparé con validación cruzada antes de mirar el test",
+     "Un único split 80/20 (300 clientes) tiene demasiada varianza para declarar un ganador. Comparé los "
+     "3 modelos primero con 5-fold estratificado sobre el conjunto de entrenamiento."),
+    ("Confirmé en un test que ningún modelo vio nunca",
+     "Solo al final, reentrené cada modelo sobre todo el train y lo evalué una única vez sobre el 20% "
+     "que quedó completamente al margen: la prueba de que el ranking no es casualidad."),
 ])
 ui.section_close()
 
@@ -232,8 +234,8 @@ ui.section_open("modelo")
 ui.eyebrow("¿Cómo intenta resolverlo?")
 ui.h2("Los 3 modelos, cara a cara")
 ui.lead(
-    "Tres algoritmos con lógicas muy distintas — un modelo lineal, un ensamble de árboles en paralelo, "
-    "y árboles entrenados en secuencia — sobre el mismo split y el mismo preprocesamiento."
+    "Comparé tres algoritmos con lógicas muy distintas (un modelo lineal, un ensamble de árboles en "
+    "paralelo, y árboles entrenados en secuencia) sobre el mismo split y el mismo preprocesamiento."
 )
 
 ui.h3("Validación cruzada (5-fold estratificado, solo sobre train)")
@@ -243,7 +245,7 @@ best_cv = cv_df.iloc[0]
 worst_cv = cv_df.iloc[-1]
 ui.finding(
     f"<b>{best_cv['modelo']}</b> lidera en validación cruzada con F1-macro={best_cv['f1_macro_media']:.3f} "
-    f"(±{best_cv['f1_macro_std']:.3f}) — un {(best_cv['f1_macro_media']/worst_cv['f1_macro_media']-1)*100:.0f}% "
+    f"(±{best_cv['f1_macro_std']:.3f}): un {(best_cv['f1_macro_media']/worst_cv['f1_macro_media']-1)*100:.0f}% "
     f"mejor que {worst_cv['modelo']} ({worst_cv['f1_macro_media']:.3f}). Los tres superan con claridad el "
     f"baseline ({stats['baseline']['f1_macro']:.3f}): hay señal real en los datos de comportamiento."
 )
@@ -251,8 +253,8 @@ ui.finding(
 ui.h3("Confirmación en test hold-out (300 clientes que ningún modelo vio)")
 st.plotly_chart(charts.test_comparison(test_df), use_container_width=True, config={"displayModeBar": False})
 ui.finding(
-    "El ranking en test coincide exactamente con el de validación cruzada — la señal es consistente, no "
-    "un golpe de suerte de un único split. Eso da confianza para elegir el modelo ganador."
+    "El ranking en test coincide exactamente con el de validación cruzada: la señal es consistente, no "
+    "un golpe de suerte de un único split. Eso me da confianza para elegir el modelo ganador."
 )
 
 ui.h3("Matrices de confusión (test)")
@@ -267,7 +269,7 @@ for c, nombre in zip(cm_cols, ["Regresión Logística", "Random Forest", "Gradie
 gb_cm = confusion_matrices[GANADOR]["matrix"]
 ui.finding(
     f"En {GANADOR}, la confusión se concentra casi siempre en la clase vecina: Básico se confunde con "
-    f"Frecuente ({gb_cm[0][1]} casos) mucho más que con Premium ({gb_cm[0][2]} caso) — y Premium nunca se "
+    f"Frecuente ({gb_cm[0][1]} casos) mucho más que con Premium ({gb_cm[0][2]} caso), y Premium nunca se "
     "confunde con Básico (0 casos). El modelo se equivoca donde tiene sentido equivocarse: entre "
     "segmentos adyacentes, nunca entre los dos extremos."
 )
@@ -293,9 +295,9 @@ with fi_col2:
                      use_container_width=True, config={"displayModeBar": False})
 ui.finding(
     "Ambos ensambles coinciden en el podio: frecuencia de viaje, distancia media y gasto anual "
-    "concentran más de la mitad de la importancia total. Pero hay un matiz honesto que hay que señalar: "
+    "concentran más de la mitad de la importancia total. Pero hay un matiz honesto que quiero señalar: "
     "<b>distancia_media_km</b> pesa mucho más aquí que en el test de fuga de información (eta² bajo, "
-    "sección anterior) — es un sesgo conocido de este tipo de importancia nativa, que tiende a "
+    "sección anterior). Es un sesgo conocido de este tipo de importancia nativa, que tiende a "
     "sobrevalorar variables numéricas con muchos valores distintos frente a las categóricas o discretas."
 )
 
@@ -305,8 +307,8 @@ st.plotly_chart(charts.odds_ratios_class(odds_df, "Premium", FEATURE_LABELS), us
 ui.finding(
     "A diferencia de los ensambles, aquí el signo importa: <b>gasto anual</b> y <b>frecuencia de viaje</b> "
     "empujan con fuerza hacia Premium, mientras que un gasto o frecuencia bajos empujan hacia Básico. "
-    "Es la ventaja de un modelo lineal — el resultado se traduce a lenguaje de negocio sin intermediarios: "
-    "\"cada euro adicional de gasto anual aumenta la probabilidad de Premium\", algo que un "
+    "Es la ventaja de un modelo lineal: el resultado se traduce a lenguaje de negocio sin intermediarios, "
+    "algo así como \"cada euro adicional de gasto anual aumenta la probabilidad de Premium\", que un "
     "<code>feature_importance_</code> no puede afirmar por sí solo."
 )
 ui.section_close()
@@ -372,12 +374,12 @@ ui.h3("¿Están de acuerdo los tres modelos?")
 if unanime:
     ui.finding(
         f"Los 3 modelos coinciden: <b>{CLASS_LABELS[list(preds.values())[0]]}</b>. Cuando el perfil del "
-        "cliente es claro, hasta los modelos más simples llegan a la misma conclusión que el más complejo "
-        "— la ventaja de un modelo sofisticado se nota sobre todo en los casos ambiguos, no en estos."
+        "cliente es claro, hasta los modelos más simples llegan a la misma conclusión que el más complejo. "
+        "La ventaja de un modelo sofisticado se nota sobre todo en los casos ambiguos, no en estos."
     )
 else:
     ui.finding(
-        "Los modelos <b>no están de acuerdo</b> — señal de que este cliente cae en una zona fronteriza "
+        "Los modelos <b>no están de acuerdo</b>: señal de que este cliente cae en una zona fronteriza "
         "entre dos segmentos. Es exactamente el tipo de caso donde la elección del modelo importa de "
         f"verdad: en producción, es {GANADOR} quien decide, por ser el que mejor generaliza en test."
     )
@@ -429,7 +431,7 @@ ui.section_close()
 
 # ============================================================ DECISIONES ==
 ui.section_open("decisiones")
-ui.eyebrow("¿Qué haríamos con esto?")
+ui.eyebrow("¿Qué haría con esto?")
 ui.h2("Decisiones que habilita")
 ui.decision_flow(
     "Marketing necesita justificar cada campaña variable a variable, no solo confiar en una caja negra",
@@ -483,8 +485,8 @@ with lc2:
 st.markdown(
     '<div class="limit-note"><p class="co-body">'
     "El rendimiento depende por completo de la calidad de las variables de incidencias y satisfacción. "
-    "Si su recogida en producción tiene sesgo o ruido — encuestas que solo responden los clientes más "
-    "extremos, incidencias mal registradas — ningún modelo, por sofisticado que sea, lo compensa."
+    "Si su recogida en producción tiene sesgo o ruido (encuestas que solo responden los clientes más "
+    "extremos, incidencias mal registradas), ningún modelo, por sofisticado que sea, lo compensa."
     "</p></div>",
     unsafe_allow_html=True,
 )
