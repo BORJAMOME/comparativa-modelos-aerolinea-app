@@ -1,0 +1,18 @@
+{
+  "n_customers": 1500,
+  "n_columns_original": 21,
+  "n_features_used": 20,
+  "n_train": 1200,
+  "n_test": 300,
+  "class_distribution": {
+    "Frecuente": 36.0,
+    "Basico": 36.0,
+    "Premium": 28.0
+  },
+  "baseline": {
+    "accuracy": 0.36,
+    "f1_macro": 0.17647058823529413
+  },
+  "n_outliers_iforest": 45,
+  "modelo_ganador": "Gradient Boosting"
+}

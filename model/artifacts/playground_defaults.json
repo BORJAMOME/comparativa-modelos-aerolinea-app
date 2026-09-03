@@ -1,0 +1,174 @@
+{
+  "numeric": {
+    "edad": {
+      "median": 47.0,
+      "min": 18.0,
+      "max": 75.0,
+      "p05": 20.0,
+      "p95": 73.0
+    },
+    "frecuencia_viaje_anual": {
+      "median": 6.0,
+      "min": 2.0,
+      "max": 12.0,
+      "p05": 3.0,
+      "p95": 10.0
+    },
+    "distancia_media_km": {
+      "median": 1400.5,
+      "min": 326.28,
+      "max": 6684.769999999997,
+      "p05": 481.9,
+      "p95": 4386.0
+    },
+    "antelacion_media_dias": {
+      "median": 42.0,
+      "min": 5.0,
+      "max": 146.01,
+      "p05": 10.0,
+      "p95": 109.0
+    },
+    "gasto_anual_eur": {
+      "median": 1171.34,
+      "min": 185.4778,
+      "max": 2763.4359392187584,
+      "p05": 425.97900000000004,
+      "p95": 2142.3539999999994
+    },
+    "retrasos_ultimos_12m": {
+      "median": 2.0,
+      "min": 0.0,
+      "max": 6.0,
+      "p05": 0.0,
+      "p95": 5.0
+    },
+    "cancelaciones_ultimos_12m": {
+      "median": 0.0,
+      "min": 0.0,
+      "max": 3.0,
+      "p05": 0.0,
+      "p95": 2.0
+    },
+    "equipaje_medio_por_vuelo": {
+      "median": 1.1,
+      "min": 0.2,
+      "max": 2.1,
+      "p05": 0.4,
+      "p95": 1.8
+    },
+    "no_shows_ultimos_12m": {
+      "median": 0.0,
+      "min": 0.0,
+      "max": 2.0,
+      "p05": 0.0,
+      "p95": 2.0
+    },
+    "satisfaccion_media": {
+      "median": 7.1,
+      "min": 3.6470000000000002,
+      "max": 10.0,
+      "p05": 4.7,
+      "p95": 9.964999999999986
+    },
+    "quejas_ultimos_12m": {
+      "median": 1.0,
+      "min": 0.0,
+      "max": 3.0,
+      "p05": 0.0,
+      "p95": 2.0
+    },
+    "antiguedad_programa_meses": {
+      "median": 34.0,
+      "min": 2.0,
+      "max": 180.0,
+      "p05": 4.0,
+      "p95": 134.0
+    },
+    "vuelos_largo_radio_anual": {
+      "median": 1.0,
+      "min": 0.0,
+      "max": 5.0,
+      "p05": 0.0,
+      "p95": 4.0
+    },
+    "vuelos_negocio_anual": {
+      "median": 2.0,
+      "min": 0.0,
+      "max": 5.0,
+      "p05": 0.0,
+      "p95": 4.0
+    },
+    "uso_codigo_promocional": {
+      "median": 0.0,
+      "min": 0.0,
+      "max": 1.0,
+      "p05": 0.0,
+      "p95": 1.0
+    },
+    "numero_maletas_max_12m": {
+      "median": 2.0,
+      "min": 0.0,
+      "max": 4.0,
+      "p05": 0.0,
+      "p95": 4.0
+    },
+    "dia_preferido_viaje": {
+      "median": 3.0,
+      "min": 0.0,
+      "max": 6.0,
+      "p05": 0.0,
+      "p95": 6.0
+    },
+    "temperatura_ciudad_residencia": {
+      "median": 19.0,
+      "min": 4.999,
+      "max": 32.900999999999996,
+      "p05": 9.295000000000002,
+      "p95": 28.704999999999995
+    }
+  },
+  "categorical_options": {
+    "canal_registro": [
+      "Agencia",
+      "App",
+      "Telefono",
+      "Web"
+    ],
+    "aeropuerto_preferido": [
+      "BCN",
+      "CDG",
+      "FRA",
+      "LHR",
+      "LIS",
+      "MAD"
+    ]
+  },
+  "categorical_defaults": {
+    "canal_registro": "Web",
+    "aeropuerto_preferido": "BCN"
+  },
+  "numeric_features": [
+    "edad",
+    "frecuencia_viaje_anual",
+    "distancia_media_km",
+    "antelacion_media_dias",
+    "gasto_anual_eur",
+    "retrasos_ultimos_12m",
+    "cancelaciones_ultimos_12m",
+    "equipaje_medio_por_vuelo",
+    "no_shows_ultimos_12m",
+    "satisfaccion_media",
+    "quejas_ultimos_12m",
+    "antiguedad_programa_meses",
+    "vuelos_largo_radio_anual",
+    "vuelos_negocio_anual",
+    "uso_codigo_promocional",
+    "numero_maletas_max_12m",
+    "dia_preferido_viaje",
+    "temperatura_ciudad_residencia"
+  ],
+  "categorical_features": [
+    "canal_registro",
+    "aeropuerto_preferido"
+  ]
+}
