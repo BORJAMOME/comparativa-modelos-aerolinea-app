@@ -2,10 +2,10 @@
 
 **Tres modelos compiten por decidir en qué segmento cae cada cliente. Solo uno merece el puesto de verdad.**
 
-Una aplicación interactiva que compara tres algoritmos de clasificación — Regresión Logística, Random
-Forest y Gradient Boosting — entrenados con el mismo criterio para clasificar automáticamente a los
-clientes de una aerolínea en tres niveles (Básico, Frecuente, Premium), y deja probar en vivo si los
-tres modelos coinciden sobre un mismo cliente hipotético.
+Una aplicación interactiva en la que comparé tres algoritmos de clasificación (Regresión Logística,
+Random Forest y Gradient Boosting), entrenados con el mismo criterio para clasificar automáticamente a
+los clientes de una aerolínea en tres niveles (Básico, Frecuente, Premium), y que deja probar en vivo si
+los tres modelos coinciden sobre un mismo cliente hipotético.
 
 No hace falta saber nada de Machine Learning para seguirla: empieza por el problema, sigue por los
 datos, compara los modelos con las mismas reglas, y termina dejándote construir un cliente hipotético
@@ -18,7 +18,7 @@ para ver qué opina cada uno.
 ## De qué trata, en dos frases
 
 Una aerolínea quiere clasificar automáticamente a sus clientes en tres segmentos para lanzar campañas
-diferenciadas, pero no tiene un criterio automatizado. Se comparan tres modelos sobre 1.500 clientes y
+diferenciadas, pero no tiene un criterio automatizado. Comparé tres modelos sobre 1.500 clientes y
 20 variables de comportamiento, con el mismo split, el mismo preprocesamiento y la misma validación
 cruzada, para que ganara el mejor modelo y no el más complejo por defecto.
 
@@ -45,8 +45,8 @@ Python + [Streamlit](https://streamlit.io) para la aplicación, y [scikit-learn]
 análisis completo, en formato notebook, está en el
 [repositorio de portfolio](https://github.com/BORJAMOME/Data-Analytics-Portfolio/tree/main/03-Machine-Learning/01-supervisado/clasificacion/04-comparativa-modelos/04-segmentacion-aerolinea).
 
-Todos los números que aparecen en la app se calculan una vez en `model/train.py` y se guardan como
-datos — nada está escrito a mano.
+Calculé todos los números que aparecen en la app una vez en `model/train.py` y los guardé como datos:
+nada está escrito a mano.
 
 ## Ejecutarla en tu ordenador
 
@@ -82,9 +82,10 @@ data/                      el dataset original
 assets/style.css           el sistema visual de la app
 ```
 
-El Playground carga los 3 pipelines de scikit-learn ya entrenados (`model/artifacts/model_*.joblib` —
-el mismo modelo, con los mismos pesos, que reporta las métricas de test) y llama a `predict_proba()` de
-cada uno sobre el cliente hipotético, para poder comparar en vivo si los 3 modelos están de acuerdo.
+Hice que el Playground cargara los 3 pipelines de scikit-learn ya entrenados
+(`model/artifacts/model_*.joblib`, el mismo modelo, con los mismos pesos, que reporta las métricas de
+test) y llamara a `predict_proba()` de cada uno sobre el cliente hipotético, para poder comparar en vivo
+si los 3 modelos están de acuerdo.
 </details>
 
 ---
