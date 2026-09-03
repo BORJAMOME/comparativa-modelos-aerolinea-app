@@ -362,15 +362,8 @@ with pg_right:
         pred = preds[nombre]
         proba = results[nombre]["proba"][pred]
         with c:
-            st.markdown(
-                f'<div class="co-card" style="text-align:center; padding:1.2rem .8rem; height:100%;">'
-                f'<div class="kpi-label" style="font-size:.72rem;">{nombre}</div>'
-                f'<div class="kpi-num" style="font-size:1.35rem; color:{CLASS_COLORS[pred]}; margin:.4rem 0 .2rem;">'
-                f'{CLASS_LABELS[pred]}</div>'
-                f'<div class="kpi-label">{pct(proba)} de confianza</div>'
-                f'</div>',
-                unsafe_allow_html=True,
-            )
+            ui.stat_card(nombre, CLASS_LABELS[pred], f"{pct(proba)} de confianza",
+                         color=CLASS_COLORS[pred], value_size="1.1rem")
     st.write("")
     st.plotly_chart(charts.playground_agreement(results, CLASS_LABELS), use_container_width=True,
                      config={"displayModeBar": False})
@@ -409,13 +402,10 @@ rep_cols = st.columns(3)
 for c, cls in zip(rep_cols, ["Basico", "Frecuente", "Premium"]):
     with c:
         row = report_gb[cls]
-        st.markdown(
-            f'<div class="co-card" style="height:100%;">'
-            f'<div class="kpi-label" style="font-weight:700; color:{CLASS_COLORS[cls]};">{CLASS_LABELS[cls]}</div>'
-            f'<div class="kpi-num" style="font-size:1.6rem; margin:.3rem 0;">{row["f1-score"]:.2f}</div>'
-            f'<div class="kpi-label">F1-score · precisión {row["precision"]:.2f} · recall {row["recall"]:.2f}</div>'
-            f'</div>',
-            unsafe_allow_html=True,
+        ui.stat_card(
+            CLASS_LABELS[cls], f'{row["f1-score"]:.2f}',
+            f'F1-score · precisión {row["precision"]:.2f} · recall {row["recall"]:.2f}',
+            title_color=CLASS_COLORS[cls],
         )
 st.write("")
 ui.finding(
