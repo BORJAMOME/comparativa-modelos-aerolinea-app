@@ -69,7 +69,7 @@ st.markdown(
     f"""
     <div id="top" class="hero-wrap">
       <p class="hero-kicker">Machine Learning Case Study · Clasificación multiclase</p>
-      <h1 class="hero-title">Tres modelos compiten por decidir en qué caja cae cada cliente. Solo uno merece el puesto <em>de verdad</em>.</h1>
+      <h1 class="hero-title">Una aerolínea le envía la misma oferta al cliente que vuela una vez al año y al que vuela cada semana, porque no tiene forma automática de <em>distinguirlos</em>. Así es como le enseñamos a un modelo a hacerlo por ella.</h1>
       <p class="hero-sub">Comparamos Regresión Logística, Random Forest y Gradient Boosting para clasificar a
       {n_fmt} clientes de una aerolínea en tres segmentos comerciales — con el mismo split, el mismo
       preprocesamiento y la misma validación cruzada, para que ganara el mejor modelo y no el más
