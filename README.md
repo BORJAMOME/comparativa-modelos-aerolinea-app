@@ -13,7 +13,7 @@ para ver qué opina cada uno.
 
 ## Ver la app
 
-🔗 **[Abrir la app](https://comparativa-modelos-aerolinea.streamlit.app)** _(actualizar con la URL real tras el deploy en Streamlit Cloud)_
+🔗 **[Abrir la app](https://comparativa-modelos-aerolinea.streamlit.app)** 
 
 ## De qué trata, en dos frases
 
