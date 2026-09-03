@@ -1,0 +1,19 @@
+variable,IQR,Z-score,Percentiles P1/P99,Isolation Forest (global)
+edad,0,0,0,45
+frecuencia_viaje_anual,29,7,26,45
+distancia_media_km,79,32,30,45
+antelacion_media_dias,45,18,28,45
+gasto_anual_eur,22,14,30,45
+retrasos_ultimos_12m,8,8,8,45
+cancelaciones_ultimos_12m,51,7,7,45
+equipaje_medio_por_vuelo,5,4,23,45
+no_shows_ultimos_12m,13,13,13,45
+satisfaccion_media,6,2,15,45
+quejas_ultimos_12m,59,12,12,45
+antiguedad_programa_meses,66,35,0,45
+vuelos_largo_radio_anual,98,4,4,45
+vuelos_negocio_anual,4,14,14,45
+uso_codigo_promocional,348,0,0,45
+numero_maletas_max_12m,0,0,0,45
+dia_preferido_viaje,0,0,0,45
+temperatura_ciudad_residencia,13,3,30,45
