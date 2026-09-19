@@ -99,6 +99,21 @@ def body(text: str):
     st.markdown(f'<p class="co-body">{text}</p>', unsafe_allow_html=True)
 
 
+def section_head(eyebrow: str, title: str, *leads: str):
+    """Cabecera de sección en dos columnas (título a la izquierda, texto a la
+    derecha) que colapsa a una columna en pantallas estrechas. Sustituye a la
+    pila vertical eyebrow + h2 + lead: aprovecha el ancho del lienzo sin alargar
+    la línea de lectura, y ahorra dos bloques de Streamlit (y sus huecos)."""
+    body = "".join(f'<p class="co-lead">{text}</p>' for text in leads)
+    cls = "co-section-head" if body else "co-section-head no-body"
+    eb = f'<p class="eyebrow">{eyebrow}</p>' if eyebrow else ""
+    body_html = f'<div class="csh-body">{body}</div>' if body else ""
+    st.markdown(
+        f'<div class="{cls}">{eb}<h2 class="co-h2">{title}</h2>{body_html}</div>',
+        unsafe_allow_html=True,
+    )
+
+
 def divider():
     st.markdown('<div class="co-divider"></div>', unsafe_allow_html=True)
 
