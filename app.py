@@ -3,13 +3,16 @@ Comparativa de Modelos — Segmentación de Clientes de Aerolínea
 Reportaje digital de datos: tres algoritmos de clasificación comparados de forma justa,
 del problema de negocio a la decisión.
 
-Narrativa (beats):
-  LEDE → 01 El problema → 02 Los datos → 03 Antes de modelar → 04 El método →
-  05 La evidencia → 06 Lo que hemos aprendido → 07 Ponlo a prueba →
-  08 Implicaciones → 09 Limitaciones → 10 Conclusión
+Narrativa (13 beats):
+  LEDE → 01 El problema → 02 Los datos → 03 Antes de construir el modelo →
+  04 Cómo construí una comparación justa → 05 Tres formas de resolver el problema →
+  06 ¿Cuál funciona mejor? → 07 ¿Dónde se equivoca? → 08 No solo importa acertar →
+  09 Ponlo a prueba → 10 El resultado → 11 ¿Qué podría hacer una empresa? →
+  12 Limitaciones → 13 Del dato a la decisión
 
 La composición vive en assets/editorial.css + components/editorial.py (sistema editorial
-reutilizable); aquí solo hay contenido y datos.
+reutilizable); aquí solo hay contenido y datos. Toda cifra del texto sale de los artefactos
+de model/artifacts (generados por model/train.py): nada está escrito a mano.
 
 Autor: Borja Mora Méndez
 """
@@ -32,7 +35,7 @@ importlib.reload(charts)
 importlib.reload(ed)
 
 ROOT = Path(__file__).resolve().parent
-LECTURA = "13 min"
+LECTURA = "15 min"
 ACTUALIZADO = "Septiembre 2026"
 FUENTE = "Elaboración propia"
 
@@ -73,13 +76,20 @@ odds_df = odds_df.rename(columns={odds_df.columns[0]: "feature"})
 models = load_models()
 
 n_fmt = f"{stats['n_customers']:,}".replace(",", ".")
-GANADOR = stats["modelo_ganador"]
+n_train, n_test = stats["n_train"], stats["n_test"]
+n_train_fmt = f"{n_train:,}".replace(",", ".")
+GANADOR = stats["modelo_ganador"]          # el de mayor F1-macro en la prueba final (train.py)
 dist = stats["class_distribution"]
+base_acc, base_f1 = stats["baseline"]["accuracy"], stats["baseline"]["f1_macro"]
 
-best_cv, worst_cv = cv_df.iloc[0], cv_df.iloc[-1]
-best_test = test_df.iloc[0]
+# Ordenados de mejor a peor F1-macro (validación cruzada / prueba final)
+best_cv, second_cv, worst_cv = cv_df.iloc[0], cv_df.iloc[1], cv_df.iloc[2]
+best_test, second_test, worst_test = test_df.iloc[0], test_df.iloc[1], test_df.iloc[2]
+ok = {r["modelo"]: round(r["accuracy"] * n_test) for _, r in test_df.iterrows()}   # clientes bien clasificados
 report_gb = classification_reports[GANADOR]
 gb_cm = confusion_matrices[GANADOR]["matrix"]
+gb_errores = sum(map(sum, gb_cm)) - sum(gb_cm[i][i] for i in range(3))
+gb_errores_vecinos = sum(gb_cm[i][j] for i in range(3) for j in range(3) if abs(i - j) == 1)
 max_vif = vif_df.loc[vif_df["VIF"].idxmax()]
 top_leak = leakage_df.iloc[0]
 top_leak_name = FEATURE_LABELS.get(top_leak["variable"], top_leak["variable"])
@@ -104,9 +114,9 @@ def pct(value: float, decimals: int = 1) -> str:
 ed.skip_link("contexto")
 ed.topbar(
     "Comparativa de Modelos · Aerolínea",
-    [("contexto", "Problema"), ("datos", "Datos"), ("metodo", "Método"), ("evidencia", "Evidencia"),
-     ("aprendizajes", "Aprendizajes"), ("playground", "Playground"), ("implicaciones", "Implicaciones"),
-     ("conclusion", "Conclusión")],
+    [("contexto", "Problema"), ("datos", "Datos"), ("metodo", "Método"), ("validacion", "Validación"),
+     ("explicabilidad", "Explicabilidad"), ("playground", "Playground"), ("resultado", "Resultado"),
+     ("implicaciones", "Implicaciones"), ("conclusion", "Conclusión")],
     back_url="https://borjamora.es/",
 )
 ed.anchor_scroll()
@@ -116,9 +126,9 @@ ed.lede(
     deck=(
         "Un cliente que vuela una vez al año no debería recibir necesariamente la misma propuesta que uno "
         "que vuela todas las semanas. A partir de su comportamiento de vuelo, gasto y relación con la "
-        "aerolínea, entrené y comparé tres modelos de Machine Learning para clasificar a cada cliente como "
-        "<b>Básico, Frecuente o Premium</b>. El objetivo: comprobar si los datos permiten automatizar esa "
-        "clasificación y <b>qué modelo lo hace mejor</b>."
+        "aerolínea, se entrenaron y compararon tres modelos de Machine Learning para clasificar a cada "
+        "cliente como <b>Básico, Frecuente o Premium</b>. El objetivo: comprobar si los datos permiten "
+        "automatizar esa clasificación y <b>qué modelo lo hace mejor</b>."
     ),
     meta=[
         ("Autor", "Borja Mora Méndez"),
@@ -131,7 +141,7 @@ ed.lede(
 
 # ============================================================ 01 · EL PROBLEMA ==
 ed.beat(
-    "contexto", "01", "Contexto", "El problema",
+    "contexto", "01", "Problema", "El problema",
     deck=(
         "La aerolínea tiene tres tipos de cliente: <b>Básico, Frecuente y Premium</b>. El reto es sencillo "
         "de plantear: si conocemos cómo vuela, cuánto gasta y cómo se relaciona con la compañía, ¿podemos "
@@ -143,13 +153,13 @@ ed.band(
     "La pregunta de negocio",
     '¿Podemos <span class="accent">predecir el segmento de un cliente a partir de su comportamiento</span> '
     "y hacerlo con suficiente fiabilidad como para utilizarlo en campañas comerciales?",
-    "Para responderla, comparé tres modelos diferentes utilizando exactamente los mismos datos y "
+    "Para responderla, se compararon tres modelos diferentes utilizando exactamente los mismos datos y "
     "criterios de evaluación.",
 )
 
 # ============================================================ 02 · LOS DATOS ==
 ed.beat(
-    "datos", "02", "Punto de partida", "Los datos",
+    "datos", "02", "Datos", "Los datos",
     deck=(
         f"Partimos de <b>{n_fmt} clientes</b> y {stats['n_columns_original']} variables que describen "
         "diferentes aspectos de su relación con la aerolínea: frecuencia de vuelo, gasto, distancia "
@@ -168,16 +178,18 @@ ed.provenance([
     ("Elaboración", FUENTE),
 ])
 ed.passage(
-    "El segmento, <code>segmento_cliente</code>, ya viene asignado por el negocio: el modelo aprende a "
-    "reproducir ese criterio, no a inventar uno nuevo.",
+    "El segmento, <code>segmento_cliente</code>, ya viene en los datos: el modelo aprende a reproducir esa "
+    "clasificación existente, no a inventar una nueva."
 )
 
-ed.subhead("Antes de construir el modelo")
-ed.passage(
-    "Un modelo solo puede ser tan bueno como los datos con los que aprende. Antes de entrenar los "
-    "modelos revisé tres aspectos: <b>datos incompletos</b>, <b>valores extremos</b> y variables que "
-    "aporten <b>información duplicada</b> o demasiado cercana al resultado que queremos predecir.",
-    tight=True,
+# ============================================================ 03 · ANTES DE CONSTRUIR EL MODELO ==
+ed.beat(
+    "calidad", "03", "Calidad del dato", "Antes de construir el modelo",
+    deck=(
+        "Un modelo solo puede ser tan bueno como los datos con los que aprende. Antes de entrenar los "
+        "modelos se revisaron tres aspectos: <b>datos incompletos</b>, <b>valores extremos</b> y variables "
+        "que aporten <b>información duplicada</b> o demasiado cercana al resultado que queremos predecir."
+    ),
 )
 
 ed.subhead("¿Cuántos datos faltan?", level="wide")
@@ -185,15 +197,16 @@ with ed.split("nulos", "5-7") as (txt, viz):
     with txt:
         ed.insight(
             f"Encontramos valores incompletos en {len(nulos_df)} variables. En lugar de eliminar esos "
-            "clientes, completé los valores utilizando información disponible en el propio conjunto de "
-            f"entrenamiento. Así <b>mantenemos los {n_fmt} clientes</b> y evitamos perder información "
-            "innecesariamente. El tratamiento se realiza dentro del pipeline para evitar que información "
-            "del conjunto de prueba influya en el entrenamiento."
+            "clientes, se completaron los valores utilizando información disponible en el propio conjunto "
+            f"de entrenamiento. Así <b>mantenemos los {n_fmt} clientes</b> y evitamos perder información "
+            "innecesariamente. Este paso se hace dentro del propio proceso de entrenamiento, para evitar que "
+            "información de la prueba final influya en el modelo."
         )
         ed.note(
             "<b>Detalle técnico.</b> Entre el 1,5% y el 3,5% de nulos por variable: poco, pero suficiente "
             "para que un <code>dropna()</code> descartara el 10,8% de las filas. Imputación con la mediana "
-            "(numéricas) y la moda (categóricas), ajustada solo sobre entrenamiento."
+            "(numéricas) y la moda (categóricas) dentro de un <code>Pipeline</code> de scikit-learn, "
+            "ajustada solo sobre entrenamiento."
         )
     with viz:
         st.dataframe(
@@ -202,41 +215,32 @@ with ed.split("nulos", "5-7") as (txt, viz):
         )
         ed.caption("TAB. 01", "Variables con valores incompletos: número y porcentaje de nulos.", FUENTE)
 
-# ============================================================ 03 · ANTES DE MODELAR ==
-ed.beat(
-    "comprobaciones", "03", "Antes de modelar", "¿Qué me dicen los datos?",
-    deck=(
-        "Resueltos los datos incompletos, quedan tres preguntas antes de entrenar nada: ¿hay clientes con "
-        "<b>comportamientos extremos</b>? ¿Hay variables que cuentan prácticamente <b>lo mismo</b>? ¿Alguna "
-        "variable le está <b>«chivando»</b> la respuesta al modelo?"
-    ),
-)
-
 ed.subhead("¿Hay clientes con comportamientos extremos?", level="wide")
 with ed.split("extremos", "5-7") as (txt, viz):
     with txt:
         ed.passage(
             "No todos los clientes tienen un comportamiento «normal»: algunos vuelan muchísimo más, gastan "
             "mucho más o recorren distancias muy superiores al resto. Estos valores pueden <b>influir "
-            "demasiado</b> en un modelo, así que analizamos los posibles casos extremos antes de entrenarlo."
+            "demasiado</b> en un modelo, así que se analizaron los posibles casos extremos antes de entrenarlo."
         )
         ed.insight(
-            "En lugar de eliminar clientes, opté por <b>limitar los valores más extremos</b> entre los "
-            f"percentiles P1 y P99. De esta forma conservamos los {n_fmt} clientes, pero evitamos que unos "
+            "En lugar de eliminar clientes, se optó por <b>limitar los valores más extremos</b> entre los "
+            f"percentiles P1 y P99. De esta forma se conservan los {n_fmt} clientes, pero se evita que unos "
             "pocos valores extremos tengan un peso desproporcionado."
         )
         ed.note(
-            "<b>Detalle técnico.</b> Los cuatro métodos no coinciden: es normal, cada uno mide algo distinto. "
-            "Opté por capar (winsorizing) en los percentiles P1/P99, la opción más conservadora. Isolation "
-            f"Forest, que sí mira todas las variables a la vez, señala un "
-            f"{pct(stats['n_outliers_iforest'] / stats['n_customers'])} de clientes como atípicos globales; "
-            "lo calculé solo con fines de exploración, nunca lo usé como variable del modelo."
+            "<b>Detalle técnico.</b> Los tres métodos comparados no coinciden: es normal, cada uno mide algo "
+            "distinto. Se eligió el capado (winsorizing) en P1/P99 por ser el más conservador. Los "
+            "percentiles se calcularon con los "
+            f"{n_fmt} clientes, antes de separar entrenamiento y prueba (ver Limitaciones). Isolation Forest, "
+            f"configurado para marcar el 3% más atípico, señala {stats['n_outliers_iforest']} clientes como "
+            "atípicos globales; se calculó solo con fines de exploración y no se usó como variable del modelo."
         )
     with viz:
         st.plotly_chart(charts.outlier_comparison(outlier_df, FEATURE_LABELS),
                         use_container_width=True, config=PLOT)
-        ed.caption("FIG. 01", "Las ocho variables con más valores atípicos, según tres métodos de detección "
-                              "(IQR, Z-score y percentiles P1/P99).", FUENTE)
+        ed.caption("FIG. 01", "Las ocho variables con más valores atípicos según el método IQR, comparadas con "
+                              "los resultados de Z-score y de los percentiles P1/P99.", FUENTE)
 
 ed.subhead("¿Hay variables que cuentan prácticamente lo mismo?", level="wide")
 with ed.split("duplicadas", "7-5") as (viz, txt):
@@ -247,7 +251,7 @@ with ed.split("duplicadas", "7-5") as (viz, txt):
     with txt:
         ed.passage(
             "Si dos variables contienen información muy parecida, pueden aportar <b>poco valor adicional</b> "
-            "al modelo. Por eso comprobé la relación entre las variables antes de entrenarlo."
+            "al modelo. Por eso se comprobó la relación entre las variables antes de entrenarlo."
         )
         ed.insight(
             "El resultado fue positivo: <b>no encontramos variables duplicadas</b> o excesivamente "
@@ -285,12 +289,12 @@ with st.expander("Ver el test de fuga de información completo"):
         use_container_width=True, hide_index=True,
     )
 
-# ============================================================ 04 · EL MÉTODO ==
+# ============================================================ 04 · CÓMO CONSTRUÍ UNA COMPARACIÓN JUSTA ==
 ed.beat(
-    "metodo", "04", "Cómo se llegó al modelo", "Cómo construí una comparación justa",
+    "metodo", "04", "Método", "Cómo construí una comparación justa",
     deck=(
         "No tiene sentido comparar tres modelos si cada uno recibe datos diferentes o se evalúa con reglas "
-        "distintas. Por eso preparé <b>un mismo proceso para los tres</b>: mismos datos, mismo "
+        "distintas. Por eso se preparó <b>un mismo proceso para los tres</b>: mismos datos, mismo "
         "preprocesamiento, mismo entrenamiento y misma evaluación. La única diferencia entre ellos es la "
         "forma en la que cada algoritmo aprende de los datos."
     ),
@@ -301,7 +305,8 @@ ed.steps([
     ("Partí de los datos ya tratados, no de los originales",
      "Los valores extremos de la sección anterior, limitados entre P1 y P99, son los que alimentan el "
      "modelo: así el tratamiento de outliers deja de ser un ejercicio aislado de exploración y pasa a "
-     "<b>formar parte del proceso real</b>."),
+     "<b>formar parte del proceso real</b>. Los percentiles se calcularon antes de separar entrenamiento "
+     "y prueba (ver Limitaciones)."),
     ("Dejé fuera una señal que un cliente nuevo no tendría",
      "El indicador de atipicidad de Isolation Forest se calculó sobre todo el dataset antes de separar "
      "entrenamiento y prueba: no es una variable de negocio disponible para un cliente nuevo. Usarla "
@@ -309,29 +314,33 @@ ed.steps([
     ("Completé los vacíos sin mirar la prueba final",
      "Nada se rellena a mano ni fuera del flujo: la mediana o la moda se calculan <b>solo con los datos de "
      "entrenamiento</b>, para que información de la prueba no se filtre al modelo (imputación y escalado "
-     "dentro de un Pipeline de scikit-learn)."),
+     "dentro del proceso de entrenamiento, con un Pipeline de scikit-learn)."),
     ("Primero necesitaba saber qué significa hacerlo bien",
      f"Un clasificador que siempre predice el segmento más frecuente acierta el "
-     f"<b>{pct(stats['baseline']['accuracy'], 0)}</b> de las veces. Ese es el suelo mínimo (baseline): ningún "
+     f"<b>{pct(base_acc, 0)}</b> de las veces. Ese es el suelo mínimo (baseline): ningún "
      "modelo real vale la pena si no lo supera con claridad."),
     ("Entrené los tres modelos en igualdad de condiciones",
-     "Regresión Logística, Random Forest y Gradient Boosting, dentro del mismo Pipeline y sobre la misma "
-     "partición de datos: la única diferencia entre ellos es <b>el algoritmo</b>, no la preparación."),
+     "Regresión Logística, Random Forest y Gradient Boosting, dentro del mismo proceso de preparación y "
+     "entrenamiento y sobre la misma partición de datos: la única diferencia entre ellos es "
+     "<b>el algoritmo</b>, no la preparación."),
     ("Comparé los modelos antes de mirar la prueba final",
-     "Una única partición 80/20 (300 clientes de prueba) tiene demasiada varianza para declarar un "
-     "ganador. Por eso comparé primero los tres modelos con <b>validación cruzada</b> de 5 particiones "
-     "estratificadas, usando solo los datos de entrenamiento."),
+     f"Una única partición 80/20 ({n_test} clientes de prueba) tiene demasiada varianza para sacar "
+     "conclusiones. Por eso se comparó primero con <b>validación cruzada</b> de 5 particiones "
+     f"estratificadas, usando solo los {n_train_fmt} clientes de entrenamiento."),
     ("La prueba final: datos que ningún modelo había visto",
-     "Solo al final, reentrené cada modelo con todo el entrenamiento y lo evalué <b>una única vez</b> sobre "
-     "el 20% de clientes que quedó completamente al margen: la prueba de que el ranking no es casualidad."),
+     f"Solo al final, cada modelo se reentrenó con todo el entrenamiento y se evaluó <b>una única vez</b> "
+     f"sobre el 20% de clientes ({n_test}) que quedó completamente al margen: una segunda comprobación, "
+     "independiente de la primera, de que el ranking se mantiene."),
 ])
 
-ed.subhead("Tres formas diferentes de resolver el mismo problema")
-ed.passage(
-    "Probé tres algoritmos para responder exactamente a la misma pregunta: <b>¿a qué segmento pertenece "
-    "este cliente?</b> Los tres reciben exactamente la misma información. Así podemos comparar sus "
-    "resultados de forma justa.",
-    tight=True,
+# ============================================================ 05 · TRES FORMAS DE RESOLVER EL PROBLEMA ==
+ed.beat(
+    "modelos", "05", "Modelos", "Tres formas de resolver el problema", weight="minor",
+    deck=(
+        "Se probaron tres algoritmos para responder exactamente a la misma pregunta: <b>¿a qué segmento "
+        "pertenece este cliente?</b> Los tres reciben exactamente la misma información. Así podemos "
+        "comparar sus resultados de forma justa."
+    ),
 )
 with ed.figure("modelos"):
     ed.cols([
@@ -345,26 +354,31 @@ with ed.figure("modelos"):
                  "las siguientes predicciones."},
     ])
 
-# ============================================================ 05 · LA EVIDENCIA ==
-ed.beat("evidencia", "05", "La evidencia", "¿Funciona de verdad?", weight="major")
-
-ed.subhead("¿Cuál funciona mejor?")
+# ============================================================ 06 · ¿CUÁL FUNCIONA MEJOR? ==
+ed.beat(
+    "validacion", "06", "Validación", "¿Cuál funciona mejor?", weight="major",
+    deck=(
+        "La comparación se hace en dos pasos: primero con <b>validación cruzada</b> sobre los datos de "
+        "entrenamiento y después, una única vez, con clientes que ningún modelo ha visto."
+    ),
+)
 with ed.figure("cv", level="story"):
-    st.plotly_chart(charts.cv_comparison(cv_df, stats["baseline"]["f1_macro"]),
-                    use_container_width=True, config=PLOT)
+    st.plotly_chart(charts.cv_comparison(cv_df, base_f1), use_container_width=True, config=PLOT)
     ed.caption("FIG. 03", "Accuracy y F1-macro medios de cada modelo en validación cruzada, con su "
                           "desviación. La línea roja marca el baseline.", FUENTE)
 ed.insight(
     "Los tres modelos encuentran patrones útiles en el comportamiento de los clientes, pero "
     f"<b>{best_cv['modelo']} obtiene el mejor resultado</b> en la validación cruzada. Su F1-macro (una "
     f"medida que da el mismo peso a los tres segmentos) alcanza {es(best_cv['f1_macro_media'])}, frente a "
-    f"{es(worst_cv['f1_macro_media'])} de {worst_cv['modelo']}. Pero todavía no podemos declararlo "
-    "ganador: antes hay que comprobar que ese resultado se mantiene con clientes que nunca ha visto.",
+    f"{es(worst_cv['f1_macro_media'])} de {worst_cv['modelo']}. Esto se ha medido solo con los datos de "
+    "entrenamiento: antes de darlo por bueno hay que ver si el resultado se mantiene con clientes que "
+    "nunca ha visto.",
     aside=(
         "Validación cruzada estratificada de 5 particiones, solo sobre entrenamiento. F1-macro medio "
         f"(±desviación): {best_cv['modelo']} {es(best_cv['f1_macro_media'])} (±{es(best_cv['f1_macro_std'])}) · "
+        f"{second_cv['modelo']} {es(second_cv['f1_macro_media'])} (±{es(second_cv['f1_macro_std'])}) · "
         f"{worst_cv['modelo']} {es(worst_cv['f1_macro_media'])} (±{es(worst_cv['f1_macro_std'])}). Los tres "
-        f"superan con claridad el baseline ({es(stats['baseline']['f1_macro'])}): hay señal real en los datos."
+        f"superan con claridad el baseline ({es(base_f1)} de F1-macro)."
     ),
 )
 
@@ -372,19 +386,20 @@ ed.subhead("¿Se mantiene con clientes que ningún modelo había visto?", level=
 with ed.split("prueba-final", "8-4") as (viz, txt):
     with viz:
         st.plotly_chart(charts.test_comparison(test_df), use_container_width=True, config=PLOT)
-        ed.caption("FIG. 04", "Accuracy y F1-macro de cada modelo sobre los 300 clientes de prueba.", FUENTE)
+        ed.caption("FIG. 04", f"Accuracy y F1-macro de cada modelo sobre los {n_test} clientes de prueba.", FUENTE)
     with txt:
         ed.insight(
             "Sí: el ranking en la prueba final <b>coincide exactamente</b> con el de la validación cruzada. "
-            "La señal es consistente, no un golpe de suerte de una única partición, y eso me da confianza "
-            "para elegir el modelo ganador."
+            "Que el orden se repita en dos evaluaciones distintas da más confianza en que la ventaja de los "
+            "ensambles de árboles sobre la Regresión Logística no es casual."
         )
-        ed.note("<b>Detalle técnico.</b> Test hold-out de 300 clientes (el 20% reservado desde el principio), "
-                "evaluado una única vez.")
+        ed.note(f"<b>Detalle técnico.</b> Test hold-out de {n_test} clientes (el 20% reservado desde el "
+                "principio), evaluado una única vez.")
 
-ed.subhead("¿Dónde se equivoca?", level="wide")
-with ed.figure("matrices"):
-    for c, nombre in zip(st.columns(3), ["Regresión Logística", "Random Forest", "Gradient Boosting"]):
+# ============================================================ 07 · ¿DÓNDE SE EQUIVOCA? ==
+ed.beat("errores", "07", "Evidencia", "¿Dónde se equivoca?", weight="minor")
+with ed.figure("matrices", level="full"):
+    for c, nombre in zip(st.columns(3, gap="large"), ["Regresión Logística", "Random Forest", "Gradient Boosting"]):
         with c:
             st.markdown(f'<p class="ed-metadata">{nombre}</p>', unsafe_allow_html=True)
             cm = confusion_matrices[nombre]
@@ -399,24 +414,8 @@ ed.insight(
     "siguen un patrón lógico: le cuesta más distinguir a los clientes que están cerca del límite entre dos "
     "segmentos.",
     aside=(
-        f"Matrices de confusión sobre el test. En {GANADOR}: Básico→Frecuente {gb_cm[0][1]} casos, "
-        f"Básico→Premium {gb_cm[0][2]}, Premium→Básico {gb_cm[2][0]}."
-    ),
-)
-
-ed.subhead("El resultado")
-ed.insight(
-    f"Después de probar los tres modelos, <b>{best_test['modelo']} obtiene el mejor rendimiento</b> tanto "
-    "en validación cruzada como en el conjunto de prueba. En el test, clasifica correctamente alrededor "
-    f"del <b>{pct(best_test['accuracy'], 0)} de los clientes</b>, frente al "
-    f"{pct(stats['baseline']['accuracy'], 0)} que conseguiríamos simplemente asignando siempre el segmento "
-    f"más frecuente. Y lo importante no es solo el {pct(best_test['accuracy'], 0)}: el ranking de los "
-    "modelos se mantiene tanto en la validación como en la prueba final, lo que indica que el resultado es "
-    "consistente y no depende de una partición concreta de los datos.",
-    aside=(
-        f"El {pct(best_test['accuracy'])} es la exactitud (accuracy) en test. En F1-macro, "
-        f"{best_test['modelo']} logra {es(best_cv['f1_macro_media'])} en validación cruzada y "
-        f"{es(best_test['f1_macro'])} en test, frente a {es(stats['baseline']['f1_macro'])} del baseline."
+        f"{gb_errores_vecinos} de los {gb_errores} errores de {GANADOR} ocurren entre segmentos vecinos. "
+        f"Básico→Frecuente {gb_cm[0][1]} casos, Básico→Premium {gb_cm[0][2]}, Premium→Básico {gb_cm[2][0]}."
     ),
 )
 
@@ -435,19 +434,10 @@ ed.insight(
     f"{es(report_gb['Premium']['f1-score'], 2)}). Tiene sentido de negocio: el punto de corte entre "
     "\"empieza a viajar mucho\" y \"ya es Premium\" es, por naturaleza, más difuso que los extremos."
 )
-ed.band(
-    "Lo que demuestra la evidencia",
-    f'<span class="pos">{GANADOR}</span> acierta el segmento <span class="pos">{pct(best_test["accuracy"], 0)}</span> '
-    f'de las veces — frente al <span class="neg">{pct(stats["baseline"]["accuracy"], 0)}</span> de asignar '
-    "siempre el segmento más frecuente.",
-    "Los tres modelos superan con claridad la referencia más simple: la señal es real. La elección final ya "
-    "no es solo técnica — depende de lo que necesite el negocio.",
-    quote=True,
-)
 
-# ============================================================ 06 · LO QUE HEMOS APRENDIDO ==
+# ============================================================ 08 · NO SOLO IMPORTA ACERTAR ==
 ed.beat(
-    "aprendizajes", "06", "Explicabilidad", "No solo importa acertar. También importa entender por qué.",
+    "explicabilidad", "08", "Explicabilidad", "No solo importa acertar. También importa entender por qué.",
     deck=(
         "Un modelo puede tener un buen rendimiento y, aun así, ser difícil de explicar. Por eso analizamos "
         "qué variables están más relacionadas con sus predicciones y qué podemos interpretar de cada "
@@ -482,32 +472,33 @@ ed.insight(
     ),
 )
 
-ed.subhead("Regresión Logística — ¿qué variables empujan hacia Premium?", level="wide")
+ed.subhead("Regresión Logística — ¿qué variables se asocian con Premium?", level="wide")
 with ed.split("odds", "5-7") as (txt, viz):
     with txt:
         ed.insight(
             "Aquí el signo importa: un <b>mayor gasto anual y una mayor frecuencia de viaje</b> están "
-            "asociados a una mayor probabilidad de pertenecer al segmento Premium, manteniendo el resto de "
-            "variables constantes, mientras que valores bajos empujan hacia Básico. Es la ventaja de un "
-            "modelo lineal: el resultado se traduce a lenguaje de negocio sin intermediarios, algo que la "
-            "importancia de variables de los ensambles no puede afirmar por sí sola."
+            "asociados a una mayor probabilidad de pertenecer al segmento Premium, manteniendo constantes el "
+            "resto de variables, mientras que valores bajos se asocian con una mayor probabilidad de Básico. "
+            "Es la ventaja de un modelo lineal: el resultado se traduce a lenguaje de negocio sin "
+            "intermediarios, algo que la importancia de variables de los ensambles no puede afirmar por sí sola."
         )
         ed.note(
-            "<b>Detalle técnico.</b> Las variables numéricas se estandarizan antes de entrenar, así que cada "
-            "odds ratio se lee por cada desviación estándar de aumento, no por euro ni por vuelo: para "
-            f"Premium, {es(or_frec, 2)} en frecuencia de viaje y {es(or_gasto, 2)} en gasto anual. Son "
-            "asociaciones del modelo, no efectos causales."
+            "<b>Detalle técnico.</b> Cada valor es exp(coeficiente) de la regresión logística multinomial. "
+            "Las variables numéricas se estandarizan antes de entrenar, así que se lee por cada desviación "
+            "estándar de aumento (no por euro ni por vuelo) y describe una asociación relativa al resto de "
+            f"segmentos, no un efecto causal. Para Premium: {es(or_frec, 2)} en frecuencia de viaje y "
+            f"{es(or_gasto, 2)} en gasto anual."
         )
     with viz:
         st.plotly_chart(charts.odds_ratios_class(odds_df, "Premium", FEATURE_LABELS),
                         use_container_width=True, config=PLOT)
-        ed.caption("FIG. 07", "Las ocho variables numéricas que más alejan la probabilidad de Premium (odds "
-                              "ratio en escala log₂, por desviación estándar). Verde: más probable Premium; "
-                              "rojo: menos.", FUENTE)
+        ed.caption("FIG. 07", "Las ocho variables numéricas más asociadas con un cambio en la probabilidad de "
+                              "Premium (exp(coeficiente) en escala log₂, por desviación estándar). Verde: más "
+                              "probable Premium; rojo: menos.", FUENTE)
 
-# ============================================================ 07 · PONLO A PRUEBA ==
+# ============================================================ 09 · PONLO A PRUEBA ==
 ed.beat(
-    "playground", "07", "Ponlo a prueba", "¿Cómo clasificarían los modelos a este cliente?", weight="major",
+    "playground", "09", "Playground", "Ponlo a prueba", weight="major",
     deck=(
         "Ahora puedes probarlo tú mismo. <b>Modifica el comportamiento de un cliente</b> y observa cómo "
         "cambia la predicción de los tres modelos: cada uno muestra el segmento que predice y la "
@@ -574,12 +565,53 @@ else:
     ed.insight(
         "Los modelos <b>no están de acuerdo</b>: señal de que este cliente cae en una zona fronteriza "
         "entre dos segmentos. Es exactamente el tipo de caso donde la elección del modelo importa de "
-        f"verdad, y donde {GANADOR} fue el que mejor generalizó en la prueba final."
+        f"verdad, y donde {GANADOR} obtuvo el mejor resultado en la prueba final."
     )
 
-# ============================================================ 08 · IMPLICACIONES ==
+# ============================================================ 10 · EL RESULTADO ==
+ed.beat("resultado", "10", "Resultado", "El resultado", weight="major")
+ed.band(
+    "La conclusión",
+    f'<span class="pos">{GANADOR}</span> obtiene el mejor rendimiento según F1-macro y accuracy, tanto en '
+    "validación cruzada como en la prueba final.",
+    f"{second_test['modelo']} queda muy cerca, y los tres modelos superan con claridad la referencia más "
+    "simple: la señal es real. La elección final ya no es solo técnica — depende de lo que necesite el negocio.",
+    quote=True,
+)
+ed.metrics([
+    ("Accuracy · prueba final", pct(best_test["accuracy"]),
+     f"{GANADOR} clasifica correctamente <b>{ok[GANADOR]} de los {n_test}</b> clientes de la prueba final. "
+     f"El baseline, asignando siempre el segmento más frecuente, acertaría el {pct(base_acc, 0)}."),
+    ("F1-macro · prueba final", es(best_test["f1_macro"]),
+     f"Promedia el acierto en Básico, Frecuente y Premium dando el mismo peso a cada segmento. El baseline "
+     f"obtiene {es(base_f1)}."),
+    ("F1-macro · validación", es(best_cv["f1_macro_media"]),
+     f"Con los datos de entrenamiento y una variación de ±{es(best_cv['f1_macro_std'])} entre particiones: "
+     "coherente con lo que se ve en la prueba final."),
+])
+ed.insight(
+    f"{second_test['modelo']} queda muy cerca: clasifica correctamente {ok[second_test['modelo']]} de los "
+    f"{n_test} clientes de prueba, frente a {ok[GANADOR]} de {GANADOR}. En validación cruzada la diferencia "
+    f"entre ambos ({es(best_cv['f1_macro_media'] - second_cv['f1_macro_media'])} de F1-macro) es menor que la "
+    f"variación entre particiones (±{es(best_cv['f1_macro_std'])}). {worst_test['modelo']} queda más atrás: "
+    f"{ok[worst_test['modelo']]} de {n_test}.",
+    aside=(
+        f"F1-macro en la prueba final: {GANADOR} {es(best_test['f1_macro'])} · "
+        f"{second_test['modelo']} {es(second_test['f1_macro'])} · "
+        f"{worst_test['modelo']} {es(worst_test['f1_macro'])}. En validación cruzada: "
+        f"{es(best_cv['f1_macro_media'])} · {es(second_cv['f1_macro_media'])} · {es(worst_cv['f1_macro_media'])}."
+    ),
+)
+ed.passage(
+    "Qué significa: los tres modelos <b>superan con claridad al baseline</b> y los dos ensambles de árboles "
+    f"superan claramente a la Regresión Logística. Entre {GANADOR} y {second_test['modelo']}, con estos datos "
+    "no se puede afirmar con seguridad cuál es mejor.",
+    tight=True,
+)
+
+# ============================================================ 11 · ¿QUÉ PODRÍA HACER UNA EMPRESA? ==
 ed.beat(
-    "implicaciones", "08", "Del análisis a la acción", "¿Qué podría hacer una empresa con este análisis?",
+    "implicaciones", "11", "Implicaciones", "¿Qué podría hacer una empresa con este análisis?",
     deck=(
         "Los resultados no dicen simplemente «utiliza este modelo»: permiten plantear <b>diferentes "
         "caminos</b> según la prioridad del negocio."
@@ -587,12 +619,13 @@ ed.beat(
 )
 with ed.figure("prioridades"):
     ed.cols([
-        {"title": "Si la prioridad es la explicabilidad",
+        {"tag": "Explicabilidad", "title": "Si la prioridad es la explicabilidad",
          "text": "La Regresión Logística ofrece una forma más sencilla de entender qué variables están "
                  "asociadas a cada segmento."},
-        {"title": "Si la prioridad es maximizar el rendimiento predictivo",
-         "text": f"{GANADOR} obtiene el mejor resultado de los tres modelos evaluados."},
-        {"title": "Si se busca una alternativa intermedia",
+        {"tag": "Rendimiento", "title": "Si la prioridad es maximizar el rendimiento predictivo",
+         "text": f"{GANADOR} obtiene el mejor resultado de los tres modelos evaluados, aunque por poco "
+                 f"frente a {second_test['modelo']}."},
+        {"tag": "Equilibrio", "title": "Si se busca una alternativa intermedia",
          "text": "Random Forest ofrece otra forma de capturar relaciones más complejas manteniendo una "
                  "interpretación relativamente accesible."},
     ])
@@ -601,12 +634,12 @@ ed.insight(
     "explicabilidad, volumen de clientes y requisitos de negocio."
 )
 
-# ============================================================ 09 · LIMITACIONES ==
-ed.beat("limitaciones", "09", "Honestidad ante todo", "Limitaciones")
+# ============================================================ 12 · LIMITACIONES ==
+ed.beat("limitaciones", "12", "Limitaciones", "Limitaciones")
 ed.lists([
     {"title": "Lo que el modelo SÍ puede hacer", "points": [
-        f"Clasificar <b>automáticamente</b> con {pct(best_test['accuracy'])} de acierto, muy por encima del "
-        f"{pct(stats['baseline']['accuracy'], 0)} de la referencia más simple.",
+        f"Clasificar <b>automáticamente</b> con {pct(best_test['accuracy'])} de clasificaciones correctas en la "
+        f"prueba final, muy por encima del {pct(base_acc, 0)} de la referencia más simple.",
         "Distinguir con claridad <b>los dos extremos</b> (Básico y Premium): casi nunca los confunde entre sí.",
         "Ofrecer <b>una versión explicable</b> (Regresión Logística) cuando Marketing necesita justificar la decisión.",
         "Señalar <b>qué variables pesan más</b>, abriendo la puerta a acciones comerciales dirigidas.",
@@ -615,6 +648,10 @@ ed.lists([
         "Distinguir con la misma fiabilidad <b>al segmento intermedio</b> (Frecuente): es el que más se confunde.",
         "Compensar problemas en los <b>datos de entrada</b>.",
         "Mantenerse fiable si <b>el comportamiento de vuelo cambia</b> de forma estructural sin reentrenar.",
+        "Demostrar <b>causalidad</b>: las variables se asocian con el segmento, pero este análisis no prueba "
+        "que lo provoquen.",
+        f"Garantizar el mismo rendimiento <b>fuera de este conjunto de datos</b>: se evaluó con {n_fmt} "
+        "clientes de un único conjunto.",
         "Generar <b>una decisión definitiva</b> por sí solo. El modelo proporciona una predicción que debe "
         "interpretarse dentro del contexto de negocio.",
     ]},
@@ -623,20 +660,29 @@ ed.passage(
     "El rendimiento depende por completo de la calidad de las variables de <b>incidencias y "
     "satisfacción</b>. Si su recogida en producción tiene sesgo o ruido (encuestas que solo responden los "
     "clientes más extremos, incidencias mal registradas), ningún modelo, por sofisticado que sea, lo "
-    "compensa."
+    "compensa.",
+    "Antes de un uso real haría falta una <b>validación adicional</b>, con datos nuevos y en el contexto de "
+    "producción.",
+    aside=(
+        f"Los percentiles P1/P99 del capado se calcularon con los {n_fmt} clientes antes de separar "
+        "entrenamiento y prueba (la imputación y el escalado sí se ajustan solo con el entrenamiento); no se "
+        "ha medido cuánto influye en los resultados. Además, los tres modelos se entrenaron con "
+        "hiperparámetros fijos, sin ajuste."
+    ),
 )
 
-# ============================================================ 10 · CONCLUSIÓN ==
+# ============================================================ 13 · DEL DATO A LA DECISIÓN ==
 ed.beat(
-    "conclusion", "10", "Conclusión", "Del dato a la decisión", weight="major",
+    "conclusion", "13", "Conclusión", "Del dato a la decisión", weight="major",
     deck=[
-        "El análisis demuestra que el comportamiento de los clientes contiene suficiente información para "
-        "identificar automáticamente diferencias entre los segmentos Básico, Frecuente y Premium. De los "
-        f"tres modelos evaluados, <b>{GANADOR} obtiene el mejor rendimiento</b> y mantiene ese resultado "
-        "tanto en validación como en el conjunto de prueba.",
-        "Pero el aprendizaje más importante no es simplemente qué modelo obtiene la mejor métrica. Es que "
+        f"Los datos de comportamiento de {n_fmt} clientes contienen información suficiente para distinguir "
+        "entre los segmentos Básico, Frecuente y Premium: los tres modelos superan con claridad la referencia "
+        f"más simple, y el mejor, <b>{GANADOR}</b>, clasifica correctamente el {pct(best_test['accuracy'], 0)} "
+        f"de los clientes de la prueba final frente al {pct(base_acc, 0)}.",
+        "Pero el aprendizaje más importante no es qué modelo obtiene la mejor métrica —la diferencia entre "
+        f"{GANADOR} y {second_test['modelo']} es pequeña—, sino que "
         "el mismo problema puede tener <b>soluciones diferentes</b> dependiendo de lo que necesite el "
-        "negocio: maximizar el rendimiento, entender las variables detrás de una predicción o encontrar un "
+        "negocio: maximizar el rendimiento, entender qué variables se asocian con cada segmento o buscar un "
         "equilibrio entre ambas. Y ahí es donde los datos dejan de ser solo un conjunto de números y "
         "<b>empiezan a servir para tomar decisiones</b>.",
     ],

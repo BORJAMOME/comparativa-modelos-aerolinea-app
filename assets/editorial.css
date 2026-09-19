@@ -93,6 +93,9 @@ html{ scroll-behavior: smooth; }
 .stMainBlockContainer > [data-testid="stVerticalBlock"] > [data-testid="stLayoutWrapper"]:has(> [class*="st-key-ed-full-"]){ grid-column: full; }
 .stMainBlockContainer > [data-testid="stVerticalBlock"] > [data-testid="stLayoutWrapper"]:has(> [class*="st-key-ed-wide-"]){ grid-column: wide; }
 
+/* Una figura FULL BLEED llega hasta el margen de página (no se detiene en el ancho wide) */
+[class*="st-key-ed-full-"]{ padding-inline: var(--page-margin); }
+
 /* Los contenedores con clave gestionan su espacio interno con márgenes, no con el gap de 1rem */
 [class*="st-key-ed-"]{ gap: 0 !important; }
 [class*="st-key-ed-"] > [data-testid="stElementContainer"]{ margin-top: var(--space-sm); }
@@ -160,7 +163,8 @@ html{ scroll-behavior: smooth; }
   font-family: var(--serif); font-weight: 700; font-size: .95rem; color: var(--ink);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;
 }
-.ed-topbar-links{ display: flex; gap: 1.2rem; }
+.ed-topbar-links{ display: flex; gap: 1.1rem; }
+@media (max-width: 1240px){ .ed-topbar-links{ display: none; } }
 .ed-topbar-links a{ letter-spacing: .03em; }
 a:focus-visible, summary:focus-visible, button:focus-visible{ outline: 2px solid var(--navy-3); outline-offset: 3px; }
 
@@ -273,7 +277,7 @@ h3.ed-subhead{
    ========================================================================== */
 .ed-metrics{ border-top: 1px solid var(--line); }
 .ed-metric{
-  display: grid; grid-template-columns: minmax(0, 9rem) minmax(0, 6.5rem) minmax(0, 1fr);
+  display: grid; grid-template-columns: minmax(0, 11.5rem) minmax(0, 6.5rem) minmax(0, 1fr);
   column-gap: var(--grid-gap); align-items: baseline; padding-block: var(--space-sm);
   border-bottom: 1px solid var(--line);
 }
@@ -365,6 +369,10 @@ div[data-testid="stSlider"] label, div[data-testid="stSelectbox"] label{ font-si
   .ed-band .ed-band-lead, .ed-band .ed-band-side{ grid-column: 1 / -1; }
   /* SPLIT: en tablet cada columna recupera el ancho completo */
   [class*="st-key-ed-wide-split-"] [data-testid="stColumn"]{ grid-column: 1 / -1 !important; }
+  /* Cualquier grupo de columnas dentro de una figura (matrices, importancias…) apila igual:
+     por defecto Streamlit solo apila por debajo de 640px y a 768px dejaba cada gráfico en 184px */
+  [class*="st-key-ed-"] [data-testid="stHorizontalBlock"]{ flex-wrap: wrap !important; }
+  [class*="st-key-ed-"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]{ flex: 1 1 100% !important; min-width: 100% !important; }
   .ed-cols{ --cols: 1 !important; }
   .ed-provenance{ grid-template-columns: minmax(0, 1fr); }
   .ed-step{ grid-template-columns: 3.2rem minmax(0, 1fr); }
