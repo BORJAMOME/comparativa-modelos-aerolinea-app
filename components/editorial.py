@@ -4,7 +4,7 @@ Cada componente responde a UNA función narrativa (no a una «pieza de UI») y s
 en el nivel de la rejilla que le corresponde (ver assets/editorial.css):
 
     FULL      band()                          momentos de alto impacto (full bleed)
-    WIDE      lede(), figure(), split(), cols()   figuras y composiciones asimétricas
+    WIDE      lede(), figure(), split(), cols(), cards()   figuras y composiciones asimétricas
     STORY     beat(), subhead(), passage(), insight(), note(), steps(), metrics()
               └─ dentro de STORY: READING (prosa) + ASIDE (notas al margen)
 
@@ -220,6 +220,31 @@ def cols(items: list, count: int = None):
         for it in items
     )
     _md(f'<div class="ed-cols" style="--cols:{count}">{body}</div>')
+
+
+def cards(items: list, count: int = None):
+    """Tarjetas para entidades paralelas y comparables cuyo COLOR las identifica (segmentos, escenarios,
+    lo que sí / no puede hacer un modelo). Es la excepción a «reducir cajas»: solo tiene sentido cuando la
+    agrupación es estructural. El color tiñe la barra superior, el fondo (7 %), el título y la cifra; el
+    cuerpo va siempre en tinta para conservar el contraste.
+
+    items: [{'tag': ..., 'title': ..., 'stat': '15,1%', 'stat_label': '978 clientes',
+             'text': ... | 'points': [...], 'color': '#hex' | 'var(--positive)'}, ...]"""
+    count = count or len(items)
+    out = []
+    for it in items:
+        seg = f' style="--seg:{it["color"]}"' if it.get("color") else ""
+        tag = f'<p class="ed-card-tag">{it["tag"]}</p>' if it.get("tag") else ""
+        stat = ""
+        if it.get("stat"):
+            label = f'<span class="ed-card-stat-label">{it["stat_label"]}</span>' if it.get("stat_label") else ""
+            stat = f'<p class="ed-card-stat"><span class="ed-card-stat-num">{it["stat"]}</span>{label}</p>'
+        if it.get("points"):
+            body = '<ul class="ed-card-list">' + "".join(f"<li>{pt}</li>" for pt in it["points"]) + "</ul>"
+        else:
+            body = f'<p class="ed-card-text">{it.get("text", "")}</p>'
+        out.append(f'<article class="ed-card"{seg}>{tag}<p class="ed-card-title">{it["title"]}</p>{stat}{body}</article>')
+    _md(f'<div class="ed-cards ed-cards--{count}" style="--cols:{count}">{"".join(out)}</div>')
 
 
 def lists(items: list):

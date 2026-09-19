@@ -307,6 +307,28 @@ h3.ed-subhead{
 .ed-list li{ font-size: calc(var(--body) * .94); line-height: 1.6; color: var(--text); margin-bottom: .7rem; }
 .ed-list li::marker{ color: var(--muted); }
 
+
+/* CARDS — solo para entidades paralelas cuyo color las identifica (segmentos, lo que sí/no puede hacer).
+   Barra superior + fondo teñido al 7 % en el color de la entidad; el cuerpo va en tinta (contraste 10:1). */
+.ed-cards{ display: grid; grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr)); gap: var(--grid-gap); align-items: stretch; }
+.ed-card{
+  --seg: var(--ink);
+  background: color-mix(in srgb, var(--seg) 7%, var(--bg));
+  border-top: 4px solid var(--seg); border-radius: 10px;
+  padding: var(--space-md) clamp(1.1rem, .8rem + 1vw, 1.7rem) clamp(1.25rem, 1rem + 1vw, 1.9rem);
+}
+.ed-card-tag{ font-size: var(--metadata); font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--label); margin: 0 0 .5rem; }
+.ed-card-title{ font-family: var(--serif); font-weight: 700; font-size: var(--subsection); line-height: 1.2; color: var(--seg); margin: 0; }
+.ed-card-stat{ display: flex; align-items: baseline; flex-wrap: wrap; gap: .15rem .7rem; margin: .8rem 0 .9rem; }
+.ed-card-stat-num{ font-family: var(--serif); font-weight: 700; font-size: clamp(2rem, 1.5rem + 1.6vw, 2.8rem); line-height: 1; color: var(--seg); font-variant-numeric: tabular-nums; }
+.ed-card-stat-label{ font-size: var(--caption); font-weight: 600; color: var(--label); }
+.ed-card-text{ font-size: calc(var(--body) * .94); line-height: 1.6; color: var(--text); margin: .8rem 0 0; }
+.ed-card-stat + .ed-card-text{ margin-top: 0; }
+.ed-card-list{ margin: .8rem 0 0; padding-left: 1.1rem; }
+.ed-card-list li{ font-size: calc(var(--body) * .94); line-height: 1.6; color: var(--text); margin-bottom: .65rem; }
+.ed-card-list li::marker{ color: var(--seg); }
+.ed-card b{ color: var(--ink); font-weight: 700; }
+
 /* STEPS — el método como recorrido numerado */
 .ed-steps{ border-top: 1px solid var(--ink); }
 .ed-step{
@@ -373,12 +395,13 @@ div[data-testid="stSlider"] label, div[data-testid="stSelectbox"] label{ font-si
      por defecto Streamlit solo apila por debajo de 640px y a 768px dejaba cada gráfico en 184px */
   [class*="st-key-ed-"] [data-testid="stHorizontalBlock"]{ flex-wrap: wrap !important; }
   [class*="st-key-ed-"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]{ flex: 1 1 100% !important; min-width: 100% !important; }
-  .ed-cols{ --cols: 1 !important; }
+  .ed-cols, .ed-cards{ --cols: 1 !important; }
   .ed-provenance{ grid-template-columns: minmax(0, 1fr); }
   .ed-step{ grid-template-columns: 3.2rem minmax(0, 1fr); }
   .ed-step-text{ grid-column: 2; }
   .ed-topbar-links{ display: none; }
 }
+@media (min-width: 1081px) and (max-width: 1280px){ .ed-cards--4{ --cols: 2 !important; } }   /* 4 tarjetas de texto largo no caben en una fila */
 @media (max-width: 640px){
   :root{ --grid-columns: 4; }
   .ed-metric{ grid-template-columns: minmax(0, 1fr) auto; row-gap: .25rem; }
