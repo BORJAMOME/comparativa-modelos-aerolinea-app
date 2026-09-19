@@ -118,6 +118,7 @@ p.co-body{ font-size: .95rem; line-height: 1.75; color: var(--text); }
   font-size: clamp(1rem, 1.4vw, 1.1rem); color: var(--muted); max-width: 600px;
   margin: 1.8rem 0 0; line-height: 1.6;
 }
+.hero-sub + .hero-sub{ margin-top: .9rem; }
 .hero-meta{
   margin-top: 1.7rem; display:flex; flex-wrap:wrap; gap:.6rem;
 }
@@ -164,6 +165,39 @@ a.hero-scroll:hover{ color: var(--ink); }
 .finding b{ color: var(--ink); }
 .finding .stat.pos{ color: var(--positive); font-weight: 700; }
 .finding .stat.neg{ color: var(--negative); font-weight: 700; }
+
+/* Detalle técnico — segundo nivel de lectura, bajo el hallazgo. Filete
+   fino arriba (no barra lateral: los callouts no llevan) y texto pequeño
+   en gris: se lee como "para quien quiera comprobarlo". */
+.tech-detail{
+  font-size: .8rem; line-height: 1.65; color: var(--muted);
+  margin: .3rem 0 1.8rem; padding-top: .7rem; border-top: 1px solid var(--line); max-width: 860px;
+}
+.tech-detail .td-k{
+  font-size: .68rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--label); margin-right: .7rem;
+}
+.tech-detail code{ font-size: .78rem; }
+
+/* Tarjetas de texto para comparar opciones (modelos, prioridades) */
+.info-card{ padding: 1.3rem 1.4rem; height: 100%; box-sizing: border-box; }
+/* Streamlit no estira el contenido de cada columna: sin esta cadena de
+   height:100% las tarjetas de una fila quedan con alturas distintas según
+   la longitud del texto. */
+div[data-testid="stColumn"]:has(.info-card) > div[data-testid="stVerticalBlock"],
+div[data-testid="stColumn"]:has(.info-card) [data-testid="stElementContainer"],
+div[data-testid="stColumn"]:has(.info-card) [data-testid="stMarkdown"],
+div[data-testid="stColumn"]:has(.info-card) [data-testid="stMarkdown"] > div,
+div[data-testid="stColumn"]:has(.info-card) [data-testid="stMarkdownContainer"]{ height: 100%; }
+.ic-tag{
+  display: block; font-size: .68rem; font-weight: 700; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--muted); margin-bottom: .55rem;
+}
+.ic-title{
+  font-family: var(--serif); color: var(--ink); font-weight: 700;
+  font-size: 1.15rem; line-height: 1.25; margin: 0 0 .55rem;
+}
+.ic-text{ font-size: .92rem; line-height: 1.65; color: var(--text); margin: 0; }
 
 /* Pipeline — es un diagrama de referencia (el orden de los pasos),
    no un dato. Antes usaba la misma caja rellena que las tarjetas de

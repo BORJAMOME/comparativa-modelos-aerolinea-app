@@ -134,6 +134,29 @@ def stat(text: str, tone: str = "") -> str:
     return f'<span class="stat {cls}">{text}</span>'
 
 
+def tech_detail(text: str):
+    """Segundo nivel de lectura: título humano → explicación humana → detalle
+    técnico. Una línea discreta bajo el hallazgo, con la jerga y las cifras
+    de método, para que quien no es técnico pueda saltársela sin perder el
+    hilo y quien sí lo es compruebe que detrás hay metodología."""
+    st.markdown(
+        f'<p class="tech-detail"><span class="td-k">Detalle técnico</span>{text}</p>',
+        unsafe_allow_html=True,
+    )
+
+
+def info_card(title: str, text: str, tag: str = ""):
+    """Tarjeta de texto para comparar opciones en un grid de columnas
+    (un modelo, una prioridad de negocio). `tag` es la etiqueta técnica
+    pequeña sobre el título."""
+    tag_html = f'<span class="ic-tag">{tag}</span>' if tag else ""
+    st.markdown(
+        f'<div class="co-card info-card">{tag_html}'
+        f'<p class="ic-title">{title}</p><p class="ic-text">{text}</p></div>',
+        unsafe_allow_html=True,
+    )
+
+
 def card_open(paper: bool = False):
     cls = "co-card paper" if paper else "co-card"
     st.markdown(f'<div class="{cls}">', unsafe_allow_html=True)
