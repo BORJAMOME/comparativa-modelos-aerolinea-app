@@ -210,10 +210,11 @@ def route(items: list):
 
 # ------------------------------------------------------------------ COLUMNAS Y LISTAS (sin cajas)
 def cols(items: list, count: int = None):
-    """Columnas con regla superior. items: [{'tag':…, 'title':…, 'text':…}, ...]"""
+    """Columnas con regla superior. items: [{'tag':…, 'title':…, 'text':…, 'color': opcional}, ...]
+    `color` tiñe la regla superior: úsalo solo cuando el color identifica una categoría (p. ej. un segmento)."""
     count = count or len(items)
     body = "".join(
-        f'<div class="ed-col">'
+        f'<div class="ed-col"' + (f' style="border-top-color:{it["color"]}"' if it.get("color") else "") + '>'
         + (f'<p class="ed-col-tag">{it["tag"]}</p>' if it.get("tag") else "")
         + f'<p class="ed-col-title">{it["title"]}</p><p class="ed-col-text">{it["text"]}</p></div>'
         for it in items
