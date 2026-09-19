@@ -78,9 +78,8 @@ st.markdown(
       <p class="hero-sub">Un cliente que vuela una vez al año no debería recibir necesariamente la misma
       propuesta que uno que vuela todas las semanas. A partir de su comportamiento de vuelo, gasto y
       relación con la aerolínea, entrené y comparé tres modelos de Machine Learning para clasificar a
-      cada cliente como Básico, Frecuente o Premium.</p>
-      <p class="hero-sub">El objetivo: comprobar si los datos permiten automatizar esa clasificación y qué
-      modelo lo hace mejor.</p>
+      cada cliente como <b>Básico, Frecuente o Premium</b>. El objetivo: comprobar si los datos permiten
+      automatizar esa clasificación y <b>qué modelo lo hace mejor</b>.</p>
       <div class="hero-meta">
         <span class="hero-pill">Borja Mora Méndez</span>
         <span class="hero-pill">Python · scikit-learn</span>
@@ -100,14 +99,11 @@ ui.section_open("contexto")
 ui.eyebrow("Contexto")
 ui.h2("El problema")
 ui.lead(
-    "La aerolínea tiene tres tipos de cliente: Básico, Frecuente y Premium. El reto es sencillo de "
+    "La aerolínea tiene tres tipos de cliente: <b>Básico, Frecuente y Premium</b>. El reto es sencillo de "
     "plantear: si conocemos cómo vuela, cuánto gasta y cómo se relaciona con la compañía, ¿podemos "
-    "utilizar esos datos para identificar automáticamente a qué segmento pertenece?"
+    "utilizar esos datos para <b>identificar automáticamente</b> a qué segmento pertenece? Esto permitiría "
+    "pasar de campañas genéricas a acciones más adaptadas a cada tipo de cliente."
 )
-ui.lead(
-    "Esto permitiría pasar de campañas genéricas a acciones más adaptadas a cada tipo de cliente."
-)
-st.write("")
 ui.question_block(
     "La pregunta de negocio",
     '¿Podemos <span class="accent">predecir el segmento de un cliente a partir de su comportamiento</span> '
@@ -123,14 +119,11 @@ ui.eyebrow("Punto de partida")
 ui.h2("Los datos")
 dist = stats["class_distribution"]
 ui.lead(
-    f"Partimos de {n_fmt} clientes y {stats['n_columns_original']} variables que describen diferentes "
+    f"Partimos de <b>{n_fmt} clientes</b> y {stats['n_columns_original']} variables que describen diferentes "
     "aspectos de su relación con la aerolínea: frecuencia de vuelo, gasto, distancia recorrida, "
-    "antigüedad, incidencias, satisfacción y fidelización."
-)
-ui.lead(
-    "El objetivo que queremos predecir es el segmento del cliente: Básico, Frecuente o Premium. Es "
-    "decir, el modelo aprende a reconocer patrones en el comportamiento de clientes que ya conocemos "
-    "para poder aplicarlos después a nuevos clientes."
+    "antigüedad, incidencias, satisfacción y fidelización. Lo que queremos predecir es <b>el segmento "
+    "del cliente</b>: el modelo aprende a reconocer patrones en el comportamiento de clientes que ya "
+    "conocemos para poder aplicarlos después a nuevos clientes."
 )
 ui.tech_detail(
     "la variable objetivo, <code>segmento_cliente</code>, ya viene asignada por el negocio: el modelo "
@@ -153,8 +146,8 @@ ui.eyebrow("Calidad del dato", muted=True)
 ui.h3("Antes de construir el modelo")
 ui.lead(
     "Un modelo solo puede ser tan bueno como los datos con los que aprende. Antes de entrenar los "
-    "modelos revisé tres aspectos: datos incompletos, valores extremos y variables que pudieran estar "
-    "aportando información duplicada o demasiado cercana al resultado que queremos predecir."
+    "modelos revisé tres aspectos: <b>datos incompletos</b>, <b>valores extremos</b> y variables que "
+    "aporten <b>información duplicada</b> o demasiado cercana al resultado que queremos predecir."
 )
 
 ui.h3("¿Cuántos datos faltan?")
@@ -165,9 +158,9 @@ st.dataframe(
 ui.finding(
     f"Encontramos valores incompletos en {len(nulos_df)} variables. En lugar de eliminar esos clientes, "
     "completé los valores utilizando información disponible en el propio conjunto de entrenamiento. "
-    f"Así mantenemos los {n_fmt} clientes y evitamos perder información innecesariamente.<br><br>"
-    "El tratamiento de estos valores se realiza dentro del pipeline para evitar que información del "
-    "conjunto de prueba influya en el entrenamiento."
+    f"Así <b>mantenemos los {n_fmt} clientes</b> y evitamos perder información innecesariamente. "
+    "El tratamiento se realiza dentro del pipeline para evitar que información del conjunto de prueba "
+    "influya en el entrenamiento."
 )
 ui.tech_detail(
     "entre el 1,5% y el 3,5% de nulos por variable: poco, pero suficiente para que un "
@@ -182,20 +175,20 @@ ui.eyebrow("Antes de modelar")
 ui.h2("¿Qué me dicen los datos?")
 ui.lead(
     "Resueltos los datos incompletos, quedan tres preguntas antes de entrenar nada: ¿hay clientes con "
-    "comportamientos extremos? ¿Hay variables que cuentan prácticamente lo mismo? ¿Alguna variable le "
-    "está «chivando» la respuesta al modelo?"
+    "<b>comportamientos extremos</b>? ¿Hay variables que cuentan prácticamente <b>lo mismo</b>? ¿Alguna "
+    "variable le está <b>«chivando»</b> la respuesta al modelo?"
 )
 
 ui.h3("¿Hay clientes con comportamientos extremos?")
 ui.body(
     "No todos los clientes tienen un comportamiento «normal»: algunos vuelan muchísimo más, gastan "
-    "mucho más o recorren distancias muy superiores al resto. Estos valores pueden influir demasiado en "
-    "un modelo, así que analizamos los posibles casos extremos antes de entrenarlo."
+    "mucho más o recorren distancias muy superiores al resto. Estos valores pueden <b>influir demasiado</b> "
+    "en un modelo, así que analizamos los posibles casos extremos antes de entrenarlo."
 )
 st.plotly_chart(charts.outlier_comparison(outlier_df, FEATURE_LABELS), use_container_width=True,
                  config={"displayModeBar": False})
 ui.finding(
-    f"En lugar de eliminar clientes, opté por limitar los valores más extremos entre los percentiles "
+    f"En lugar de eliminar clientes, opté por <b>limitar los valores más extremos</b> entre los percentiles "
     f"P1 y P99. De esta forma conservamos los {n_fmt} clientes, pero evitamos que unos pocos valores "
     "extremos tengan un peso desproporcionado."
 )
@@ -210,16 +203,16 @@ with st.expander("Detalle técnico: métodos de detección e Isolation Forest"):
 
 ui.h3("¿Hay variables que cuentan prácticamente lo mismo?")
 ui.body(
-    "Si dos variables contienen información muy parecida, pueden aportar poco valor adicional al "
+    "Si dos variables contienen información muy parecida, pueden aportar <b>poco valor adicional</b> al "
     "modelo. Por eso comprobé la relación entre las variables antes de entrenarlo."
 )
 st.plotly_chart(charts.correlation_heatmap(correlacion_df, FEATURE_LABELS), use_container_width=True,
                  config={"displayModeBar": False})
 max_vif = vif_df.loc[vif_df["VIF"].idxmax()]
 ui.finding(
-    "El resultado fue positivo: no encontramos problemas relevantes de variables duplicadas o "
-    "excesivamente relacionadas entre sí. Esto significa que podemos mantener la información "
-    "disponible sin necesidad de eliminar variables por este motivo."
+    "El resultado fue positivo: <b>no encontramos variables duplicadas</b> o excesivamente "
+    "relacionadas entre sí. Esto significa que podemos mantener la información disponible sin "
+    "necesidad de eliminar variables por este motivo."
 )
 ui.tech_detail(
     f"el VIF (factor de inflación de la varianza) máximo fue {es(max_vif['VIF'], 2)} "
@@ -231,16 +224,16 @@ ui.h3("¿Hay alguna variable que le esté «chivando» la respuesta al modelo?")
 ui.body(
     "Antes de entrenar un modelo hay que asegurarse de que no existe ninguna variable que revele "
     "prácticamente por sí sola cuál es el segmento del cliente. Eso sería <b>fuga de información</b>: "
-    "el modelo parecería muy bueno, pero porque le estamos dando pistas que en una situación real no "
-    "tendría."
+    "el modelo parecería muy bueno, pero porque le estamos dando pistas que en una situación real "
+    "no tendría."
 )
 top_leak = leakage_df.iloc[0]
 top_leak_name = FEATURE_LABELS.get(top_leak["variable"], top_leak["variable"])
 ui.finding(
     "No encontramos ninguna variable con una separación casi perfecta. La variable más relacionada "
-    f"con el segmento es <b>{top_leak_name}</b>, algo que tiene sentido: cuanto más vuela un cliente, "
-    "más información aporta sobre su relación con la aerolínea.<br><br>"
-    "<b>Conclusión:</b> encontramos señal útil, pero no una respuesta escondida en los datos."
+    f"con el segmento es {top_leak_name}, algo que tiene sentido: cuanto más vuela un cliente, "
+    "más información aporta sobre su relación con la aerolínea. En resumen: "
+    "hay <b>señal útil, pero no una respuesta escondida</b> en los datos."
 )
 ui.tech_detail(
     f"test ANOVA F / eta²: ninguna variable supera eta²=0,95 (separación casi perfecta); la más alta "
@@ -259,36 +252,36 @@ ui.eyebrow("Cómo se llegó al modelo")
 ui.h2("Cómo construí una comparación justa")
 ui.lead(
     "No tiene sentido comparar tres modelos si cada uno recibe datos diferentes o se evalúa con reglas "
-    "distintas. Por eso preparé un mismo proceso para los tres: mismos datos, mismo preprocesamiento, "
-    "mismo entrenamiento y misma evaluación. La única diferencia entre ellos sería la forma en la que "
-    "cada algoritmo aprende de los datos."
+    "distintas. Por eso preparé <b>un mismo proceso para los tres</b>: mismos datos, mismo "
+    "preprocesamiento, mismo entrenamiento y misma evaluación. La única diferencia entre ellos es "
+    "la forma en la que cada algoritmo aprende de los datos."
 )
 ui.story_steps([
     ("Partí de los datos ya tratados, no de los originales",
      "Los valores extremos de la sección anterior, limitados entre P1 y P99, son los que alimentan el "
      "modelo: así el tratamiento de outliers deja de ser un ejercicio aislado de exploración y pasa a "
-     "formar parte del proceso real."),
+     "<b>formar parte del proceso real</b>."),
     ("Dejé fuera una señal que un cliente nuevo no tendría",
      "El indicador de atipicidad de Isolation Forest se calculó sobre todo el dataset antes de separar "
      "entrenamiento y prueba: no es una variable de negocio disponible para un cliente nuevo. Usarla "
-     "habría sido hacer trampas."),
+     "habría sido <b>hacer trampas</b>."),
     ("Completé los vacíos sin mirar la prueba final",
-     "Nada se rellena a mano ni fuera del flujo: la mediana o la moda se calculan solo con los datos de "
-     "entrenamiento, para que información de la prueba no se filtre al modelo (imputación y escalado "
+     "Nada se rellena a mano ni fuera del flujo: la mediana o la moda se calculan <b>solo con los datos de "
+     "entrenamiento</b>, para que información de la prueba no se filtre al modelo (imputación y escalado "
      "dentro de un Pipeline de scikit-learn)."),
     ("Primero necesitaba saber qué significa hacerlo bien",
      f"Un clasificador que siempre predice el segmento más frecuente acierta el "
-     f"{pct(stats['baseline']['accuracy'], 0)} de las veces. Ese es el suelo mínimo (baseline): ningún "
+     f"<b>{pct(stats['baseline']['accuracy'], 0)}</b> de las veces. Ese es el suelo mínimo (baseline): ningún "
      "modelo real vale la pena si no lo supera con claridad."),
     ("Entrené los tres modelos en igualdad de condiciones",
      "Regresión Logística, Random Forest y Gradient Boosting, dentro del mismo Pipeline y sobre la misma "
-     "partición de datos: la única diferencia entre ellos es el algoritmo, no la preparación."),
+     "partición de datos: la única diferencia entre ellos es <b>el algoritmo</b>, no la preparación."),
     ("Comparé los modelos antes de mirar la prueba final",
      "Una única partición 80/20 (300 clientes de prueba) tiene demasiada varianza para declarar un "
-     "ganador. Por eso comparé primero los tres modelos con validación cruzada de 5 particiones "
+     "ganador. Por eso comparé primero los tres modelos con <b>validación cruzada</b> de 5 particiones "
      "estratificadas, usando solo los datos de entrenamiento."),
     ("La prueba final: datos que ningún modelo había visto",
-     "Solo al final, reentrené cada modelo con todo el entrenamiento y lo evalué una única vez sobre el "
+     "Solo al final, reentrené cada modelo con todo el entrenamiento y lo evalué <b>una única vez</b> sobre el "
      "20% de clientes que quedó completamente al margen: la prueba de que el ranking no es casualidad."),
 ])
 ui.section_close()
@@ -322,10 +315,9 @@ with mc3:
         "siguientes predicciones.",
         tag="Árboles en secuencia",
     )
-st.write("")
 ui.body(
-    "Los tres reciben exactamente la misma información. Así podemos comparar sus resultados de forma "
-    "justa."
+    "Los tres reciben exactamente la misma información. Así podemos comparar sus resultados de "
+    "forma justa."
 )
 
 best_cv = cv_df.iloc[0]
@@ -333,11 +325,11 @@ worst_cv = cv_df.iloc[-1]
 ui.h3("¿Cuál funciona mejor?")
 ui.finding(
     f"Los tres modelos encuentran patrones útiles en el comportamiento de los clientes, pero "
-    f"<b>{best_cv['modelo']}</b> obtiene el mejor resultado en la validación cruzada. Su F1-macro "
+    f"<b>{best_cv['modelo']} obtiene el mejor resultado</b> en la validación cruzada. Su F1-macro "
     f"(una medida que da el mismo peso a los tres segmentos) alcanza {es(best_cv['f1_macro_media'])}, "
-    f"frente a {es(worst_cv['f1_macro_media'])} de {worst_cv['modelo']}.<br><br>"
-    "Pero todavía no podemos declararlo ganador. Antes necesitamos comprobar que ese resultado también "
-    "se mantiene cuando el modelo se enfrenta a clientes que nunca ha visto."
+    f"frente a {es(worst_cv['f1_macro_media'])} de {worst_cv['modelo']}. Pero todavía no podemos "
+    "declararlo ganador: antes hay que comprobar que ese resultado se mantiene con clientes que "
+    "nunca ha visto."
 )
 st.plotly_chart(charts.cv_comparison(cv_df, stats["baseline"]["f1_macro"]), use_container_width=True,
                  config={"displayModeBar": False})
@@ -350,9 +342,9 @@ ui.tech_detail(
 
 ui.h3("¿Se mantiene con clientes que ningún modelo había visto?")
 ui.finding(
-    "Sí: el ranking en la prueba final coincide exactamente con el de la validación cruzada. La señal "
-    "es consistente, no un golpe de suerte de una única partición. Eso me da confianza para elegir el "
-    "modelo ganador."
+    "Sí: el ranking en la prueba final <b>coincide exactamente</b> con el de la validación cruzada. La "
+    "señal es consistente, no un golpe de suerte de una única partición, y eso me da confianza para "
+    "elegir el modelo ganador."
 )
 st.plotly_chart(charts.test_comparison(test_df), use_container_width=True, config={"displayModeBar": False})
 ui.tech_detail("test hold-out de 300 clientes (el 20% reservado desde el principio), evaluado una única vez.")
@@ -360,12 +352,11 @@ ui.tech_detail("test hold-out de 300 clientes (el 20% reservado desde el princip
 gb_cm = confusion_matrices[GANADOR]["matrix"]
 ui.h3("¿Dónde se equivoca?")
 ui.finding(
-    f"{GANADOR} comete la mayoría de sus errores entre segmentos vecinos. Por ejemplo, Básico se "
-    "confunde mucho más con Frecuente que con Premium.<br><br>"
-    "Y hay algo especialmente interesante: en el conjunto de prueba, <b>ningún cliente Premium fue "
-    "clasificado como Básico</b>.<br><br>"
-    "El modelo no es perfecto, pero sus errores siguen un patrón lógico: le cuesta más distinguir a los "
-    "clientes que están cerca del límite entre dos segmentos."
+    f"{GANADOR} comete la mayoría de sus errores <b>entre segmentos vecinos</b>: Básico se confunde "
+    "mucho más con Frecuente que con Premium. Y hay algo especialmente interesante: en el conjunto de "
+    "prueba, <b>ningún cliente Premium fue clasificado como Básico</b>. El modelo no es perfecto, pero "
+    "sus errores siguen un patrón lógico: le cuesta más distinguir a los clientes que están cerca del "
+    "límite entre dos segmentos."
 )
 cm_cols = st.columns(3)
 for c, nombre in zip(cm_cols, ["Regresión Logística", "Random Forest", "Gradient Boosting"]):
@@ -388,12 +379,9 @@ ui.h2("No solo importa acertar. También importa entender por qué.")
 ui.lead(
     "Un modelo puede tener un buen rendimiento y, aun así, ser difícil de explicar. Por eso analizamos "
     "qué variables están más relacionadas con sus predicciones y qué podemos interpretar de cada "
-    "algoritmo."
-)
-ui.lead(
-    "Los resultados muestran un patrón bastante claro: la frecuencia de vuelo, la distancia recorrida y "
-    "el gasto anual aparecen entre las variables más relevantes. Pero cada modelo nos permite "
-    "interpretar esta relación de una manera diferente."
+    "algoritmo. El patrón es bastante claro: <b>la frecuencia de vuelo, la distancia recorrida y el gasto "
+    "anual</b> aparecen entre las variables más relevantes, aunque cada modelo permite interpretar esa "
+    "relación de una manera diferente."
 )
 
 fi_col1, fi_col2 = st.columns(2)
@@ -406,11 +394,10 @@ with fi_col2:
     st.plotly_chart(charts.feature_importance(fi_gb, FEATURE_LABELS, color=charts.INK),
                      use_container_width=True, config={"displayModeBar": False})
 ui.finding(
-    "Los dos modelos coinciden en las variables más relevantes: frecuencia de viaje, distancia media y "
-    "gasto anual.<br><br>"
-    "<b>Importante:</b> la importancia de variables de estos modelos no significa necesariamente que "
-    "una variable sea la causa de una decisión. En este caso, la importancia nativa puede favorecer "
-    "determinadas variables numéricas. Por eso interpretamos estos resultados con cautela."
+    "Los dos modelos coinciden en las variables más relevantes: frecuencia de viaje, distancia "
+    "media y gasto anual. Importante: que una variable pese mucho no significa necesariamente que sea "
+    "la causa de una decisión, y en este caso la importancia nativa puede favorecer determinadas "
+    "variables numéricas. Por eso interpretamos estos resultados <b>con cautela</b>."
 )
 dist_eta2 = leakage_df.loc[leakage_df["variable"] == "distancia_media_km", "eta2"].iloc[0]
 top3_share = min(fi_rf["importancia"].head(3).sum(), fi_gb["importancia"].head(3).sum())
@@ -429,11 +416,11 @@ odds_idx = odds_df.set_index("feature")
 or_frec = odds_idx.loc["num__frecuencia_viaje_anual", "Premium"]
 or_gasto = odds_idx.loc["num__gasto_anual_eur", "Premium"]
 ui.finding(
-    "Aquí el signo importa: un <b>mayor gasto anual</b> y una <b>mayor frecuencia de viaje</b> están "
-    "asociados a una mayor probabilidad de pertenecer al segmento Premium, manteniendo el resto de "
-    "variables constantes. Un gasto o una frecuencia bajos empujan, en cambio, hacia Básico.<br><br>"
-    "Es la ventaja de un modelo lineal: el resultado se puede traducir a lenguaje de negocio sin "
-    "intermediarios, algo que la importancia de variables de los ensambles no puede afirmar por sí sola."
+    "Aquí el signo importa: un <b>mayor gasto anual y una mayor frecuencia de viaje</b> están asociados "
+    "a una mayor probabilidad de pertenecer al segmento Premium, manteniendo el resto de variables "
+    "constantes, mientras que valores bajos empujan hacia Básico. Es la ventaja de un modelo lineal: "
+    "el resultado se traduce a lenguaje de negocio sin intermediarios, algo que la importancia "
+    "de variables de los ensambles no puede afirmar por sí sola."
 )
 ui.tech_detail(
     "las variables numéricas se estandarizan antes de entrenar, así que cada odds ratio se lee por "
@@ -448,11 +435,11 @@ ui.section_open("playground")
 ui.eyebrow("Ponlo a prueba")
 ui.h2("¿Cómo clasificarían los modelos a este cliente?")
 ui.lead(
-    "Ahora puedes probarlo tú mismo. Modifica el comportamiento de un cliente y observa cómo cambia la "
-    "predicción de los tres modelos. Cada modelo muestra tanto el segmento que predice como la "
-    "probabilidad que asigna a cada opción."
+    "Ahora puedes probarlo tú mismo. <b>Modifica el comportamiento de un cliente</b> y observa cómo "
+    "cambia la predicción de los tres modelos: cada uno muestra el segmento que predice y la "
+    "probabilidad que asigna a cada opción. ¿Coinciden los tres? ¿Qué ocurre cuando el perfil del "
+    "cliente es menos claro?"
 )
-ui.lead("¿Coinciden los tres? ¿Qué ocurre cuando el perfil del cliente es menos claro?")
 
 num_defaults = playground_defaults["numeric"]
 cat_options = playground_defaults["categorical_options"]
@@ -498,7 +485,6 @@ with pg_right:
         with c:
             ui.stat_card(nombre, CLASS_LABELS[pred], f"{pct(proba)} de probabilidad",
                          color=CLASS_COLORS[pred], value_size="1.1rem")
-    st.write("")
     st.plotly_chart(charts.playground_agreement(results, CLASS_LABELS), use_container_width=True,
                      config={"displayModeBar": False})
 
@@ -507,7 +493,7 @@ if unanime:
     ui.finding(
         f"Los 3 modelos coinciden: <b>{CLASS_LABELS[list(preds.values())[0]]}</b>. Cuando el perfil del "
         "cliente es claro, hasta los modelos más simples llegan a la misma conclusión que el más complejo. "
-        "La ventaja de un modelo sofisticado se nota sobre todo en los casos ambiguos, no en estos."
+        "La ventaja de un modelo sofisticado se nota sobre todo en <b>los casos ambiguos</b>, no en estos."
     )
 else:
     ui.finding(
@@ -524,16 +510,13 @@ ui.h2("El resultado")
 best_test = test_df.iloc[0]
 worst_test = test_df.iloc[-1]
 ui.lead(
-    f"Después de probar los tres modelos, <b>{best_test['modelo']}</b> obtiene el mejor rendimiento tanto "
+    f"Después de probar los tres modelos, <b>{best_test['modelo']} obtiene el mejor rendimiento</b> tanto "
     "en validación cruzada como en el conjunto de prueba. En el test, clasifica correctamente alrededor "
-    f"del <b>{pct(best_test['accuracy'], 0)}</b> de los clientes, frente al "
-    f"<b>{pct(stats['baseline']['accuracy'], 0)}</b> que conseguiríamos simplemente asignando siempre el "
-    "segmento más frecuente."
-)
-ui.lead(
-    f"Lo importante no es solo el {pct(best_test['accuracy'], 0)}. El ranking de los modelos se mantiene "
-    "tanto durante la validación como en la prueba final, lo que indica que el resultado es consistente "
-    "y no depende únicamente de una partición concreta de los datos."
+    f"del <b>{pct(best_test['accuracy'], 0)} de los clientes</b>, frente al "
+    f"{pct(stats['baseline']['accuracy'], 0)} que conseguiríamos simplemente asignando siempre el "
+    f"segmento más frecuente. Y lo importante no es solo el {pct(best_test['accuracy'], 0)}: el ranking "
+    "de los modelos se mantiene tanto en la validación como en la prueba final, lo que indica que "
+    "el resultado es consistente y no depende de una partición concreta de los datos."
 )
 ui.tech_detail(
     f"el {pct(best_test['accuracy'])} es la exactitud (accuracy) en test. En F1-macro, {best_test['modelo']} "
@@ -552,7 +535,6 @@ for c, cls in zip(rep_cols, ["Basico", "Frecuente", "Premium"]):
             f'F1-score · precisión {es(row["precision"], 2)} · recall {es(row["recall"], 2)}',
             title_color=CLASS_COLORS[cls],
         )
-st.write("")
 ui.finding(
     f"El segmento más difícil de acertar es <b>Frecuente</b> (F1={es(report_gb['Frecuente']['f1-score'], 2)}), "
     "justo el que está en medio — comparte comportamiento con ambos vecinos. Básico y Premium, los dos "
@@ -577,8 +559,8 @@ ui.section_open("decisiones")
 ui.eyebrow("Del análisis a la acción")
 ui.h2("¿Qué podría hacer una empresa con este análisis?")
 ui.lead(
-    "Los resultados no dicen simplemente «utiliza este modelo». Permiten plantear diferentes caminos "
-    "dependiendo de la prioridad del negocio."
+    "Los resultados no dicen simplemente «utiliza este modelo»: permiten plantear <b>diferentes caminos</b> "
+    "según la prioridad del negocio."
 )
 dc1, dc2, dc3 = st.columns(3, gap="medium")
 with dc1:
@@ -598,10 +580,9 @@ with dc3:
         "Random Forest ofrece otra forma de capturar relaciones más complejas manteniendo una "
         "interpretación relativamente accesible.",
     )
-st.write("")
 ui.finding(
-    "La elección final dependería del contexto real: coste de los errores, necesidad de explicabilidad, "
-    "volumen de clientes y requisitos de negocio."
+    "La elección final dependería del <b>contexto real</b>: coste de los errores, necesidad de "
+    "explicabilidad, volumen de clientes y requisitos de negocio."
 )
 ui.section_close()
 
@@ -614,10 +595,10 @@ with lc1:
     st.markdown('<p class="limit-col-title">Lo que el modelo SÍ puede hacer</p>', unsafe_allow_html=True)
     st.markdown(
         f"""<ul class="limit-list">
-        <li>Clasificar automáticamente y con {pct(best_test['accuracy'])} de acierto, muy por encima del {pct(stats['baseline']['accuracy'], 0)} de la referencia más simple.</li>
-        <li>Distinguir con claridad los dos extremos (Básico y Premium) — casi nunca los confunde entre sí.</li>
-        <li>Ofrecer una versión explicable (Regresión Logística) cuando Marketing necesita justificar la decisión.</li>
-        <li>Señalar qué variables pesan más, abriendo la puerta a acciones comerciales dirigidas.</li>
+        <li>Clasificar <b>automáticamente</b> con {pct(best_test['accuracy'])} de acierto, muy por encima del {pct(stats['baseline']['accuracy'], 0)} de la referencia más simple.</li>
+        <li>Distinguir con claridad <b>los dos extremos</b> (Básico y Premium): casi nunca los confunde entre sí.</li>
+        <li>Ofrecer <b>una versión explicable</b> (Regresión Logística) cuando Marketing necesita justificar la decisión.</li>
+        <li>Señalar <b>qué variables pesan más</b>, abriendo la puerta a acciones comerciales dirigidas.</li>
         </ul>""",
         unsafe_allow_html=True,
     )
@@ -625,18 +606,19 @@ with lc2:
     st.markdown('<p class="limit-col-title">Lo que el modelo NO puede hacer</p>', unsafe_allow_html=True)
     st.markdown(
         f"""<ul class="limit-list">
-        <li>Distinguir con la misma fiabilidad al segmento intermedio (Frecuente) — es el que más se confunde.</li>
-        <li>Compensar problemas en los datos de entrada.</li>
-        <li>Mantenerse fiable si el comportamiento de vuelo cambia de forma estructural sin reentrenar.</li>
-        <li>Generar una decisión definitiva por sí solo. El modelo proporciona una predicción que debe interpretarse dentro del contexto de negocio.</li>
+        <li>Distinguir con la misma fiabilidad <b>al segmento intermedio</b> (Frecuente): es el que más se confunde.</li>
+        <li>Compensar problemas en los <b>datos de entrada</b>.</li>
+        <li>Mantenerse fiable si <b>el comportamiento de vuelo cambia</b> de forma estructural sin reentrenar.</li>
+        <li>Generar <b>una decisión definitiva</b> por sí solo. El modelo proporciona una predicción que debe interpretarse dentro del contexto de negocio.</li>
         </ul>""",
         unsafe_allow_html=True,
     )
 st.markdown(
     '<div class="limit-note"><p class="co-body">'
-    "El rendimiento depende por completo de la calidad de las variables de incidencias y satisfacción. "
-    "Si su recogida en producción tiene sesgo o ruido (encuestas que solo responden los clientes más "
-    "extremos, incidencias mal registradas), ningún modelo, por sofisticado que sea, lo compensa."
+    "El rendimiento depende por completo de la calidad de las variables de <b>incidencias y "
+    "satisfacción</b>. Si su recogida en producción tiene sesgo o ruido (encuestas que solo responden "
+    "los clientes más extremos, incidencias mal registradas), ningún modelo, por sofisticado que sea, "
+    "lo compensa."
     "</p></div>",
     unsafe_allow_html=True,
 )
@@ -648,19 +630,16 @@ ui.eyebrow("Conclusión")
 ui.h2("Del dato a la decisión")
 ui.lead(
     "El análisis demuestra que el comportamiento de los clientes contiene suficiente información para "
-    "identificar automáticamente diferencias entre los segmentos Básico, Frecuente y Premium. De los "
-    f"tres modelos evaluados, <b>{GANADOR}</b> obtiene el mejor rendimiento y mantiene ese resultado "
+    "identificar automáticamente diferencias entre los segmentos Básico, Frecuente y Premium. De "
+    f"los tres modelos evaluados, <b>{GANADOR} obtiene el mejor rendimiento</b> y mantiene ese resultado "
     "tanto en validación como en el conjunto de prueba."
 )
 ui.lead(
-    "Pero el aprendizaje más importante no es simplemente qué modelo obtiene la mejor métrica. Es que el "
-    "mismo problema puede tener soluciones diferentes dependiendo de lo que necesite el negocio: "
-    "maximizar el rendimiento, entender las variables detrás de una predicción o encontrar un equilibrio "
-    "entre ambas."
-)
-ui.lead(
-    "Y ahí es donde los datos dejan de ser solo un conjunto de números y empiezan a servir para tomar "
-    "decisiones."
+    "Pero el aprendizaje más importante no es simplemente qué modelo obtiene la mejor métrica. Es que "
+    "el mismo problema puede tener <b>soluciones diferentes</b> dependiendo de lo que necesite el "
+    "negocio: maximizar el rendimiento, entender las variables detrás de una predicción o encontrar un "
+    "equilibrio entre ambas. Y ahí es donde los datos dejan de ser solo un conjunto de números y "
+    "<b>empiezan a servir para tomar decisiones</b>."
 )
 ui.section_close()
 

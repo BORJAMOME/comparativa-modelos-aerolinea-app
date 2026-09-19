@@ -162,7 +162,12 @@ a.hero-scroll:hover{ color: var(--ink); }
   background: var(--card); border-radius: 10px;
   padding: 1rem 1.3rem; margin: .8rem 0; font-size: .92rem; line-height: 1.65; color: var(--text);
 }
-.finding b{ color: var(--ink); }
+/* Palabras clave — regla del 10 % (deck Data Storytelling, Parte 04): solo se
+   destaca lo que un lector en diagonal debe llevarse, 1-2 frases cortas por
+   bloque. La negrita va en tinta oscura, sin color: el color se reserva para
+   lo semántico (.stat.pos / .neg). Leyendo solo lo destacado se entiende el caso. */
+.co-lead b, .co-body b, .hero-sub b, .finding b, .story-step .ss-text b,
+.ic-text b, ul.limit-list b, .limit-note b, .question-sub b{ color: var(--ink); font-weight: 700; }
 .finding .stat.pos{ color: var(--positive); font-weight: 700; }
 .finding .stat.neg{ color: var(--negative); font-weight: 700; }
 
