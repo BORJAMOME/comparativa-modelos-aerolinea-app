@@ -71,7 +71,6 @@ python model/train.py    # tarda 1-2 minutos (validación cruzada de los 3 model
 app.py                    la aplicación — toda la narrativa, sección a sección
 components/
   editorial.py              sistema editorial: un componente por función narrativa (lede, beat, figure, insight…)
-  ui.py                    bloques visuales heredados de versiones anteriores (ya no los usa app.py)
   charts.py                gráficos, con la paleta de colores del proyecto
 utils/
   data_loader.py            carga de artefactos y de los 3 modelos entrenados (con cache de Streamlit)
