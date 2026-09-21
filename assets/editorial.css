@@ -401,7 +401,10 @@ div[data-testid="stSlider"] label, div[data-testid="stSelectbox"] label{ font-si
   .ed-step-text{ grid-column: 2; }
   .ed-topbar-links{ display: none; }
 }
-@media (min-width: 1081px) and (max-width: 1280px){ .ed-cards--4{ --cols: 2 !important; } }   /* 4 tarjetas de texto largo no caben en una fila */
+@media (min-width: 1081px) and (max-width: 1280px){        /* 4–5 tarjetas de texto largo no caben en una fila */
+  .ed-cards--4{ --cols: 2 !important; }
+  .ed-cards--5, .ed-cols--5{ --cols: 3 !important; }
+}
 @media (max-width: 640px){
   :root{ --grid-columns: 4; }
   .ed-metric{ grid-template-columns: minmax(0, 1fr) auto; row-gap: .25rem; }

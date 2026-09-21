@@ -219,7 +219,7 @@ def cols(items: list, count: int = None):
         + f'<p class="ed-col-title">{it["title"]}</p><p class="ed-col-text">{it["text"]}</p></div>'
         for it in items
     )
-    _md(f'<div class="ed-cols" style="--cols:{count}">{body}</div>')
+    _md(f'<div class="ed-cols ed-cols--{count}" style="--cols:{count}">{body}</div>')
 
 
 def cards(items: list, count: int = None):
