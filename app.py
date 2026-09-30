@@ -6,7 +6,7 @@ del problema de negocio a la decisión.
 Narrativa (13 beats):
   LEDE → 01 El problema → 02 Los datos → 03 Antes de construir el modelo →
   04 Cómo construí una comparación justa → 05 Tres formas de resolver el problema →
-  06 ¿Cuál funciona mejor? → 07 ¿Dónde se equivoca? → 08 No solo importa acertar →
+  06 ¿Cuál funciona mejor? → 07 ¿Dónde se equivoca? → 08 Saber por qué acierta →
   09 Ponlo a prueba → 10 El resultado → 11 ¿Qué podría hacer una empresa? →
   12 Limitaciones → 13 Del dato a la decisión
 
@@ -145,7 +145,7 @@ ed.beat(
     deck=(
         "La aerolínea tiene tres tipos de cliente: <b>Básico, Frecuente y Premium</b>. El reto es sencillo "
         "de plantear: si conocemos cómo vuela, cuánto gasta y cómo se relaciona con la compañía, ¿podemos "
-        "utilizar esos datos para <b>identificar automáticamente</b> a qué segmento pertenece? Esto "
+        "usar esos datos para <b>identificar automáticamente</b> a qué segmento pertenece? Esto "
         "permitiría pasar de campañas genéricas a acciones más adaptadas a cada tipo de cliente."
     ),
 )
@@ -186,8 +186,7 @@ ed.passage(
 ed.beat(
     "calidad", "03", "Calidad del dato", "Antes de construir el modelo",
     deck=(
-        "Un modelo solo puede ser tan bueno como los datos con los que aprende. Antes de entrenar los "
-        "modelos se revisaron tres aspectos: <b>datos incompletos</b>, <b>valores extremos</b> y variables "
+        "Antes de entrenar nada se revisaron tres cosas: <b>datos incompletos</b>, <b>valores extremos</b> y variables "
         "que aporten <b>información duplicada</b> o demasiado cercana al resultado que queremos predecir."
     ),
 )
@@ -254,15 +253,14 @@ with ed.split("duplicadas", "7-5") as (viz, txt):
             "al modelo. Por eso se comprobó la relación entre las variables antes de entrenarlo."
         )
         ed.insight(
-            "El resultado fue positivo: <b>no encontramos variables duplicadas</b> o excesivamente "
-            "relacionadas entre sí. Esto significa que podemos mantener la información disponible sin "
-            "necesidad de eliminar variables por este motivo."
+            "<b>No encontramos variables duplicadas</b> ni excesivamente relacionadas entre sí, así que no "
+            "hubo que eliminar ninguna por este motivo."
         )
         ed.note(
             f"<b>Detalle técnico.</b> El VIF (factor de inflación de la varianza) máximo fue "
             f"{es(max_vif['VIF'], 2)} ({FEATURE_LABELS.get(max_vif['variable'], max_vif['variable'])}), por "
-            "debajo del nivel habitual de alerta (5). La correlación entre variables es prácticamente nula "
-            "en casi todos los pares."
+            "debajo del nivel habitual de alerta (5). La correlación es prácticamente nula en casi todos los "
+            "pares; la más alta, 0,67, une frecuencia de viaje y gasto anual, algo esperable."
         )
 
 ed.subhead("¿Hay alguna variable que le esté «chivando» la respuesta al modelo?")
@@ -275,9 +273,8 @@ ed.passage(
 )
 ed.insight(
     "No encontramos ninguna variable con una separación casi perfecta. La variable más relacionada con "
-    f"el segmento es {top_leak_name}, algo que tiene sentido: cuanto más vuela un cliente, más información "
-    "aporta sobre su relación con la aerolínea. En resumen: hay <b>señal útil, pero no una respuesta "
-    "escondida</b> en los datos.",
+    f"el segmento es {top_leak_name}, algo lógico: cuánto vuela un cliente dice mucho de su segmento, pero "
+    "no lo decide por sí solo. Hay <b>señal útil, pero no una respuesta escondida</b> en los datos.",
     aside=(
         f"Test ANOVA F / eta²: ninguna variable supera eta²=0,95 (separación casi perfecta); la más alta es "
         f"{top_leak_name} con eta²={es(top_leak['eta2'], 2)}."
@@ -338,15 +335,15 @@ ed.beat(
     "modelos", "05", "Modelos", "Tres formas de resolver el problema", weight="minor",
     deck=(
         "Se probaron tres algoritmos para responder exactamente a la misma pregunta: <b>¿a qué segmento "
-        "pertenece este cliente?</b> Los tres reciben exactamente la misma información. Así podemos "
-        "comparar sus resultados de forma justa."
+        "pertenece este cliente?</b> Los tres reciben la misma información; lo que cambia es cómo aprende "
+        "cada uno."
     ),
 )
 with ed.figure("modelos"):
     ed.cols([
         {"tag": "Modelo lineal", "title": "Regresión Logística",
-         "text": "Un modelo relativamente sencillo y fácil de interpretar. Es especialmente interesante "
-                 "cuando queremos entender qué variables están detrás de cada predicción."},
+         "text": "El más sencillo y el más fácil de interpretar. Útil cuando hay que explicar qué "
+                 "variables están detrás de cada predicción."},
         {"tag": "Árboles en paralelo", "title": "Random Forest",
          "text": "Combina muchos árboles de decisión para encontrar patrones más complejos en los datos."},
         {"tag": "Árboles en secuencia", "title": "Gradient Boosting",
@@ -409,8 +406,8 @@ with ed.figure("matrices", level="full"):
                           "segmento predicho.", FUENTE)
 ed.insight(
     f"{GANADOR} comete la mayoría de sus errores <b>entre segmentos vecinos</b>: Básico se confunde mucho "
-    "más con Frecuente que con Premium. Y hay algo especialmente interesante: en el conjunto de prueba, "
-    "<b>ningún cliente Premium fue clasificado como Básico</b>. El modelo no es perfecto, pero sus errores "
+    "más con Frecuente que con Premium. Y en el conjunto de prueba "
+    "<b>ningún cliente Premium fue clasificado como Básico</b>. El modelo falla, pero sus errores "
     "siguen un patrón lógico: le cuesta más distinguir a los clientes que están cerca del límite entre dos "
     "segmentos.",
     aside=(
@@ -429,15 +426,15 @@ ed.metrics([
 ])
 ed.insight(
     f"El segmento más difícil de acertar es <b>Frecuente</b> (F1={es(report_gb['Frecuente']['f1-score'], 2)}), "
-    "justo el que está en medio — comparte comportamiento con ambos vecinos. Básico y Premium, los dos "
+    "justo el que está en medio y comparte comportamiento con sus dos vecinos. Básico y Premium, los dos "
     f"extremos, son más fáciles de distinguir (F1={es(report_gb['Basico']['f1-score'], 2)} y "
     f"{es(report_gb['Premium']['f1-score'], 2)}). Tiene sentido de negocio: el punto de corte entre "
-    "\"empieza a viajar mucho\" y \"ya es Premium\" es, por naturaleza, más difuso que los extremos."
+    "«empieza a viajar mucho» y «ya es Premium» es, por naturaleza, más difuso que los extremos."
 )
 
 # ============================================================ 08 · NO SOLO IMPORTA ACERTAR ==
 ed.beat(
-    "explicabilidad", "08", "Explicabilidad", "No solo importa acertar. También importa entender por qué.",
+    "explicabilidad", "08", "Explicabilidad", "Acertar está bien. Saber por qué acierta, mejor.",
     deck=(
         "Un modelo puede tener un buen rendimiento y, aun así, ser difícil de explicar. Por eso analizamos "
         "qué variables están más relacionadas con sus predicciones y qué podemos interpretar de cada "
@@ -575,7 +572,8 @@ ed.band(
     f'<span class="pos">{GANADOR}</span> obtiene el mejor rendimiento según F1-macro y accuracy, tanto en '
     "validación cruzada como en la prueba final.",
     f"{second_test['modelo']} queda muy cerca, y los tres modelos superan con claridad la referencia más "
-    "simple: la señal es real. La elección final ya no es solo técnica — depende de lo que necesite el negocio.",
+    "simple: la señal es real. A partir de aquí la elección ya no es solo técnica: depende de lo que necesite "
+    "el negocio.",
     quote=True,
 )
 ed.metrics([
@@ -604,7 +602,7 @@ ed.insight(
 )
 ed.passage(
     "Qué significa: los tres modelos <b>superan con claridad al baseline</b> y los dos ensambles de árboles "
-    f"superan claramente a la Regresión Logística. Entre {GANADOR} y {second_test['modelo']}, con estos datos "
+    f"quedan bastante por delante de la Regresión Logística. Entre {GANADOR} y {second_test['modelo']}, con estos datos "
     "no se puede afirmar con seguridad cuál es mejor.",
     tight=True,
 )
@@ -657,10 +655,9 @@ ed.lists([
     ]},
 ])
 ed.passage(
-    "El rendimiento depende por completo de la calidad de las variables de <b>incidencias y "
-    "satisfacción</b>. Si su recogida en producción tiene sesgo o ruido (encuestas que solo responden los "
-    "clientes más extremos, incidencias mal registradas), ningún modelo, por sofisticado que sea, lo "
-    "compensa.",
+    "El modelo se apoya sobre todo en <b>frecuencia de viaje, distancia y gasto anual</b>. Si esos datos "
+    "llegan en producción con retraso, errores o criterios de registro distintos, ningún modelo, por "
+    "sofisticado que sea, lo compensa.",
     "Antes de un uso real haría falta una <b>validación adicional</b>, con datos nuevos y en el contexto de "
     "producción.",
     aside=(
@@ -679,12 +676,10 @@ ed.beat(
         "entre los segmentos Básico, Frecuente y Premium: los tres modelos superan con claridad la referencia "
         f"más simple, y el mejor, <b>{GANADOR}</b>, clasifica correctamente el {pct(best_test['accuracy'], 0)} "
         f"de los clientes de la prueba final frente al {pct(base_acc, 0)}.",
-        "Pero el aprendizaje más importante no es qué modelo obtiene la mejor métrica —la diferencia entre "
-        f"{GANADOR} y {second_test['modelo']} es pequeña—, sino que "
-        "el mismo problema puede tener <b>soluciones diferentes</b> dependiendo de lo que necesite el "
-        "negocio: maximizar el rendimiento, entender qué variables se asocian con cada segmento o buscar un "
-        "equilibrio entre ambas. Y ahí es donde los datos dejan de ser solo un conjunto de números y "
-        "<b>empiezan a servir para tomar decisiones</b>.",
+        f"La diferencia entre {GANADOR} y {second_test['modelo']} es pequeña, así que lo que más me llevo "
+        "de este proyecto no es el nombre del ganador. Es que el mismo problema admite <b>soluciones "
+        "diferentes</b> según lo que necesite el negocio: exprimir el rendimiento o poder explicar qué "
+        "variables se asocian con cada segmento. Esa decisión ya no la toma el modelo.",
     ],
 )
 ed.colophon("Borja Mora Méndez", [

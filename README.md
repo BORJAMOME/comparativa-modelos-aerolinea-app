@@ -1,6 +1,6 @@
 # Comparativa de Modelos — Segmentación de Clientes de Aerolínea
 
-**Tres modelos compiten por decidir en qué segmento cae cada cliente. Solo uno merece el puesto de verdad.**
+**Tres modelos compiten por decidir en qué segmento cae cada cliente. Gana uno, pero por poco, y no siempre es el que conviene.**
 
 Una aplicación interactiva en la que comparé tres algoritmos de clasificación (Regresión Logística,
 Random Forest y Gradient Boosting), entrenados con el mismo criterio para clasificar automáticamente a
@@ -23,7 +23,7 @@ diferenciadas, pero no tiene un criterio automatizado. Comparé tres modelos sob
 cruzada, para que ganara el mejor modelo y no el más complejo por defecto.
 
 **El resultado:** Gradient Boosting gana con un F1-macro de 0,784 en validación cruzada (0,799 en test),
-un 18% mejor que la Regresión Logística y muy por encima del baseline (17,6%). Pero la app también
+un 18% mejor que la Regresión Logística y muy por encima del baseline (0,176). Pero la app también
 muestra por qué, en algunos casos, la Regresión Logística sigue siendo la opción correcta: cuando
 Marketing necesita explicar la decisión, no solo acertarla.
 
