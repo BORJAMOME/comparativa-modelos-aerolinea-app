@@ -100,4 +100,8 @@ y una escala tipográfica editorial (`--headline`, `--section-title`, `--body`, 
 `components/editorial.py` expone un componente por función narrativa. Para reutilizarlo: copiar ambos
 archivos y definir la paleta en el `style.css` del nuevo proyecto (`--ink --text --muted --line --navy-* …`).
 
+## Licencia
+
+El código está bajo licencia [MIT](LICENSE). Los datasets de `data/` pertenecen a sus fuentes originales y no están incluidos en esta licencia.
+
 **Autor:** Borja Mora Méndez · [LinkedIn](https://www.linkedin.com/in/borjamoramendez/) · [GitHub](https://github.com/BORJAMOME)
