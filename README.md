@@ -1,4 +1,4 @@
-# Comparativa de Modelos — Segmentación de Clientes de Aerolínea
+# Comparativa de Modelos - Segmentación de Clientes de Aerolínea
 
 **Tres modelos compiten por decidir en qué segmento cae cada cliente. Gana uno, pero por poco, y no siempre es el que conviene.**
 
@@ -48,21 +48,6 @@ análisis completo, en formato notebook, está en el
 Calculé todos los números que aparecen en la app una vez en `model/train.py` y los guardé como datos:
 nada está escrito a mano.
 
-## Ejecutarla en tu ordenador
-
-```bash
-pip install -r requirements.txt
-streamlit run app.py
-```
-
-Los resultados del modelo ya vienen calculados en `model/artifacts/`, así que no hace falta reentrenar
-nada para verla funcionar.
-
-Solo si cambias el dataset (`data/dataset_linea_aerea_multiclase_v2.xlsx`) necesitas regenerarlos:
-
-```bash
-python model/train.py    # tarda 1-2 minutos (validación cruzada de los 3 modelos)
-```
 
 <details>
 <summary>Estructura del proyecto, para quien quiera curiosear el código</summary>
@@ -91,14 +76,6 @@ si los 3 modelos están de acuerdo.
 
 ---
 
-### Sistema editorial (reutilizable en otros proyectos de ML)
-
-La app se compone como un reportaje digital, no como una página. `assets/editorial.css` convierte el
-contenedor de Streamlit en una rejilla con cinco niveles de ancho (`--canvas-width` / `--wide-width` /
-`--story-width` / `--reading-width` / `--aside-width`), una escala de espacio (`--space-xs` … `--space-3xl`)
-y una escala tipográfica editorial (`--headline`, `--section-title`, `--body`, `--caption`, `--metadata`).
-`components/editorial.py` expone un componente por función narrativa. Para reutilizarlo: copiar ambos
-archivos y definir la paleta en el `style.css` del nuevo proyecto (`--ink --text --muted --line --navy-* …`).
 
 ## Licencia
 
