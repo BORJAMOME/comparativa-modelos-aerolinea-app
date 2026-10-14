@@ -1,84 +1,67 @@
 # Comparativa de Modelos - Segmentación de Clientes de Aerolínea
 
-**Tres modelos compiten por decidir en qué segmento cae cada cliente. Gana uno, pero por poco, y no siempre es el que conviene.**
+En este proyecto he comparado tres modelos de Machine Learning para clasificar a los clientes de una aerolínea en tres segmentos: Básico, Frecuente y Premium.
 
-Una aplicación interactiva en la que comparé tres algoritmos de clasificación (Regresión Logística,
-Random Forest y Gradient Boosting), entrenados con el mismo criterio para clasificar automáticamente a
-los clientes de una aerolínea en tres niveles (Básico, Frecuente, Premium), y que deja probar en vivo si
-los tres modelos coinciden sobre un mismo cliente hipotético.
+He trabajado con los mismos datos y criterios de evaluación para comparar la Regresión Logística, Random Forest y Gradient Boosting. Además, he preparado una aplicación en la que se puede probar un cliente hipotético y comprobar qué segmento le asigna cada modelo.
 
-No hace falta saber nada de Machine Learning para seguirla: empieza por el problema, sigue por los
-datos, compara los modelos con las mismas reglas, y termina dejándote construir un cliente hipotético
-para ver qué opina cada uno.
+## Ver la aplicación
 
-## Ver la app
+**[Abrir la aplicación interactiva](https://comparativa-modelos-aerolinea.streamlit.app)**
 
-🔗 **[Abrir la app](https://comparativa-modelos-aerolinea.streamlit.app)** 
+## El análisis
 
-## De qué trata, en dos frases
+He trabajado con un conjunto de datos de 1.500 clientes y 21 variables originales. Antes de entrenar los modelos, he revisado la calidad de los datos, los valores atípicos, la multicolinealidad y posibles problemas de fuga de información.
 
-Una aerolínea quiere clasificar automáticamente a sus clientes en tres segmentos para lanzar campañas
-diferenciadas, pero no tiene un criterio automatizado. Comparé tres modelos sobre 1.500 clientes y
-20 variables de comportamiento, con el mismo split, el mismo preprocesamiento y la misma validación
-cruzada, para que ganara el mejor modelo y no el más complejo por defecto.
+Después, he comparado los tres algoritmos utilizando el mismo preprocesamiento, la misma partición de los datos y validación cruzada. Así he podido evaluar sus resultados bajo las mismas condiciones.
 
-**El resultado:** Gradient Boosting gana con un F1-macro de 0,784 en validación cruzada (0,799 en test),
-un 18% mejor que la Regresión Logística y muy por encima del baseline (0,176). Pero la app también
-muestra por qué, en algunos casos, la Regresión Logística sigue siendo la opción correcta: cuando
-Marketing necesita explicar la decisión, no solo acertarla.
+### Resultados
 
-## Qué te vas a encontrar al recorrerla
+Gradient Boosting ha obtenido el mejor resultado, con un F1-macro de 0,784 en validación cruzada y de 0,799 en el conjunto de test.
 
-1. **El problema** — por qué una aerolínea necesita automatizar la segmentación de clientes
-2. **Los datos** — 1.500 clientes, 21 variables originales, calidad del dato y outliers
-3. **Antes de modelar** — outliers, multicolinealidad y fuga de información, antes de entrenar nada
-4. **El camino hasta la comparativa** — cómo se garantiza que la comparación entre modelos sea justa
-5. **Los 3 modelos cara a cara** — validación cruzada, test hold-out y matrices de confusión
-6. **Explicabilidad** — qué variables pesan más en cada modelo, y por qué el signo importa en la logística
-7. **Playground** — construye un cliente hipotético y mira si los 3 modelos están de acuerdo, en directo
-8. **Resultados y decisiones** — qué modelo desplegar según lo que necesite el negocio
+En esta comparación, su resultado en validación cruzada es aproximadamente un 18 % superior al de la Regresión Logística. También he incluido un modelo de referencia (*baseline*) para comprobar cuánto mejoran los algoritmos respecto a una predicción sencilla.
 
-## Cómo está hecho
+Sin embargo, el resultado no es el único factor que he tenido en cuenta. La Regresión Logística permite interpretar con más facilidad cómo influyen las variables en las predicciones, algo que puede ser relevante cuando también importa explicar por qué se asigna un segmento a un cliente.
 
-Python + [Streamlit](https://streamlit.io) para la aplicación, y [scikit-learn](https://scikit-learn.org)
-(`LogisticRegression`, `RandomForestClassifier`, `GradientBoostingClassifier`) para los modelos. El
-análisis completo, en formato notebook, está en el
-[repositorio de portfolio](https://github.com/BORJAMOME/Data-Analytics-Portfolio/tree/main/03-Machine-Learning/01-supervisado/clasificacion/04-comparativa-modelos/04-segmentacion-aerolinea).
+## Qué encontrarás en la aplicación
 
-Calculé todos los números que aparecen en la app una vez en `model/train.py` y los guardé como datos:
-nada está escrito a mano.
+He organizado el análisis en ocho apartados:
 
+1. **El problema:** por qué puede ser útil clasificar a los clientes en distintos segmentos.
+2. **Los datos:** qué información contiene el conjunto de datos y qué problemas he encontrado.
+3. **Preparación de los datos:** revisión de valores atípicos, multicolinealidad y posibles fugas de información.
+4. **Preparación de los modelos:** cómo he organizado el proceso para poder compararlos en las mismas condiciones.
+5. **Comparativa de resultados:** métricas, validación cruzada y matrices de confusión.
+6. **Interpretación de los modelos:** qué variables tienen más peso y cómo interpretar su influencia.
+7. **Prueba con un cliente hipotético:** introducción de valores para comparar las predicciones de los tres modelos.
+8. **Conclusiones:** qué diferencias he encontrado y qué tendría en cuenta al elegir un modelo.
+
+## Código y metodología
+
+He desarrollado el análisis con Python y scikit-learn, utilizando `LogisticRegression`, `RandomForestClassifier` y `GradientBoostingClassifier`.
+
+Los resultados y las métricas se calculan mediante `model/train.py` y se guardan para que la aplicación pueda mostrarlos sin volver a entrenar los modelos cada vez que se abre.
+
+En la prueba con un cliente hipotético utilizo los tres modelos entrenados para obtener sus predicciones y probabilidades, lo que permite comparar sus respuestas con los mismos datos de entrada.
+
+**[Consultar el código y los notebooks en GitHub](https://github.com/BORJAMOME/Data-Analytics-Portfolio/tree/main/03-Machine-Learning/01-supervisado/clasificacion/04-comparativa-modelos/04-segmentacion-aerolinea)**
 
 <details>
-<summary>Estructura del proyecto, para quien quiera curiosear el código</summary>
+<summary>Estructura del proyecto</summary>
 
-```
-app.py                    la aplicación — toda la narrativa, sección a sección
+```text
+app.py                    Aplicación y contenido de las secciones
 components/
-  editorial.py              sistema editorial: un componente por función narrativa (lede, beat, figure, insight…)
-  charts.py                gráficos, con la paleta de colores del proyecto
+  editorial.py            Componentes para presentar el análisis
+  charts.py               Gráficos y colores del proyecto
 utils/
-  data_loader.py            carga de artefactos y de los 3 modelos entrenados (con cache de Streamlit)
-  classifier.py              predice el segmento de un cliente hipotético con los 3 modelos en vivo
+  data_loader.py           Carga de datos y modelos entrenados
+  classifier.py             Predicciones para clientes hipotéticos
 model/
-  train.py                    entrena y evalúa los 3 modelos, calcula todos los resultados
-  artifacts/                   resultados ya calculados (métricas, matrices, los 3 pipelines entrenados)
-data/                      el dataset original
-assets/editorial.css       sistema de composición editorial (rejilla, niveles de ancho, ritmo, tokens) — reutilizable
-assets/style.css           identidad de este proyecto (paleta y familias tipográficas)
-```
-
-Hice que el Playground cargara los 3 pipelines de scikit-learn ya entrenados
-(`model/artifacts/model_*.joblib`, el mismo modelo, con los mismos pesos, que reporta las métricas de
-test) y llamara a `predict_proba()` de cada uno sobre el cliente hipotético, para poder comparar en vivo
-si los 3 modelos están de acuerdo.
-</details>
-
----
-
-
-## Licencia
-
-El código está bajo licencia [MIT](LICENSE). Los datasets de `data/` pertenecen a sus fuentes originales y no están incluidos en esta licencia.
+  train.py                  Entrenamiento y evaluación de los modelos
+  artifacts/                Métricas, matrices y modelos entrenados
+data/                       Dataset original
+assets/
+  editorial.css             Estilos de composición
+  style.css                 Colores y tipografías del proyecto
 
 **Autor:** Borja Mora Méndez · [LinkedIn](https://www.linkedin.com/in/borjamoramendez/) · [GitHub](https://github.com/BORJAMOME)
