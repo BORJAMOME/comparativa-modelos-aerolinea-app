@@ -160,8 +160,8 @@ def odds_ratios_class(odds_df: pd.DataFrame, class_name: str, feature_labels: di
 
 
 def playground_agreement(results: dict, class_labels: dict) -> go.Figure:
-    """Grouped bar: para cada modelo, probabilidad asignada a cada clase —
-    permite ver de un vistazo si los 3 modelos están de acuerdo o no."""
+    """Grouped bar: para cada modelo, probabilidad asignada a cada clase.
+    Permite ver de un vistazo si los 3 modelos están de acuerdo o no."""
     models = list(results.keys())
     classes = ["Basico", "Frecuente", "Premium"]
     fig = go.Figure()

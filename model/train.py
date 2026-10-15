@@ -91,7 +91,7 @@ def main():
     outlier_comparativa["Isolation Forest (global)"] = n_outliers_if
     outlier_comparativa.to_csv(ARTIFACTS / "outlier_comparativa.csv", index=False)
 
-    # -- Capado (winsorizing P1/P99) — nunca se sobrescribe el df original ---------
+    # -- Capado (winsorizing P1/P99): nunca se sobrescribe el df original ---------
     df_sin_outliers = df.copy()
     for v in variables_numericas:
         p1, p99 = df[v].quantile(0.01), df[v].quantile(0.99)

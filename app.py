@@ -1,5 +1,5 @@
 """
-Comparativa de Modelos — Segmentación de Clientes de Aerolínea
+Comparativa de Modelos: Segmentación de Clientes de Aerolínea
 Reportaje digital de datos: tres algoritmos de clasificación comparados de forma justa,
 del problema de negocio a la decisión.
 
@@ -451,7 +451,7 @@ with ed.figure("importancias"):
         [("Random Forest", fi_rf, charts.NAVY3), (GANADOR, fi_gb, charts.INK)],
     ):
         with c:
-            st.markdown(f'<p class="ed-metadata">{nombre} — variables más usadas</p>', unsafe_allow_html=True)
+            st.markdown(f'<p class="ed-metadata">{nombre}: variables más usadas</p>', unsafe_allow_html=True)
             st.plotly_chart(charts.feature_importance(fi, FEATURE_LABELS, color=color),
                             use_container_width=True, config=PLOT)
     ed.caption("FIG. 06", "Variables que más pesan en las decisiones de cada ensamble de árboles.", FUENTE)
@@ -469,7 +469,7 @@ ed.insight(
     ),
 )
 
-ed.subhead("Regresión Logística — ¿qué variables se asocian con Premium?", level="wide")
+ed.subhead("Regresión Logística: ¿qué variables se asocian con Premium?", level="wide")
 with ed.split("odds", "5-7") as (txt, viz):
     with txt:
         ed.insight(
