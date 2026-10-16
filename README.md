@@ -1,4 +1,4 @@
-# Comparativa de modelos de Machine Learning: Segmentación de clientes de aerolínea
+# ¿Y si una aerolínea pudiera reconocer automáticamente qué tipo de cliente tiene delante?
 
 En este proyecto he comparado tres modelos de Machine Learning para clasificar a los clientes de una aerolínea en tres segmentos: Básico, Frecuente y Premium.
 
