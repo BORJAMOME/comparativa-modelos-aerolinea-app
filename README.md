@@ -4,7 +4,7 @@ Pra este proyecto he comparado tres modelos de Machine Learning para clasificar 
 
 Mi objetivo ha sido comprobar qué diferencias hay entre la Regresión **Logística, Random Forest y Gradient Boosting** al trabajar con los mismos datos y criterios de evaluación. Para ello, he desarrollado un recurso visual interactivo en el que se puede probar un cliente hipotético y comparar las predicciones de los tres modelos.
 
-**[➡ Abrir la aplicación interactiva](https://comparativa-modelos-aerolinea.streamlit.app)**
+**[➡ Abrir el proyecto](https://comparativa-modelos-aerolinea.streamlit.app)**
 
 ## El análisis
 
